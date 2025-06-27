@@ -1,6 +1,13 @@
 {
   "item.testmod.strawberry": "Клубничка",
   "item.testmod.strawberry_seeds": "Семена клубники",
-  "itemGroup.testmod": "Тестовый Мод",
-  "block.testmod.strawberry_crop": "Клубничная грядка"
+  "block.testmod.strawberry_crop": "Клубничная грядка",
+  "block.testmod.magic_log": "Магическое бревно",
+  "block.testmod.magic_planks": "Магические доски",
+  "block.testmod.magic_wood": "Магическая древесина",
+  "block.testmod.stripped_magic_log": "Очищенное магическое бревно",
+  "block.testmod.stripped_magic_wood": "Очищенная магическая древесина",
+  "block.testmod.magic_leaves": "Магические листья",
+  "block.testmod.magic_sapling": "Саженец магического дерева",
+  "itemGroup.testmod": "Тестовый Мод"
 }

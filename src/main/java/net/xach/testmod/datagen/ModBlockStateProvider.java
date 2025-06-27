@@ -15,6 +15,7 @@ import net.xach.testmod.TestMod;
 import net.xach.testmod.block.ModBlocks;
 import net.xach.testmod.block.StrawberryCrop;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class ModBlockStateProvider extends BlockStateProvider {
@@ -25,6 +26,33 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         makeCrop(((CropBlock) ModBlocks.STRAWBERRY_CROP.get()), "strawberry_crop_stage", "strawberry_crop_stage");
+
+        logBlock(ModBlocks.MAGIC_LOG.get());
+        axisBlock(ModBlocks.MAGIC_WOOD.get(), blockTexture(ModBlocks.MAGIC_LOG.get()), blockTexture(ModBlocks.MAGIC_LOG.get()));
+        logBlock(ModBlocks.STRIPPED_MAGIC_LOG.get());
+        axisBlock(ModBlocks.STRIPPED_MAGIC_WOOD.get(), blockTexture(ModBlocks.STRIPPED_MAGIC_LOG.get()), blockTexture(ModBlocks.STRIPPED_MAGIC_LOG.get()));
+
+        blockItem(ModBlocks.MAGIC_LOG);
+        blockItem(ModBlocks.MAGIC_WOOD);
+        blockItem(ModBlocks.STRIPPED_MAGIC_LOG);
+        blockItem(ModBlocks.STRIPPED_MAGIC_WOOD);
+
+        blockWithItem(ModBlocks.MAGIC_PLANKS);
+
+        leavesBlock(ModBlocks.MAGIC_LEAVES);
+        saplingBlock(ModBlocks.MAGIC_SAPLING);
+    }
+
+
+    private void saplingBlock(RegistryObject<Block> blockRegistryObject) {
+        simpleBlock(blockRegistryObject.get(),
+                models().cross(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get())).getPath(), blockTexture(blockRegistryObject.get())).renderType("cutout"));
+    }
+
+    private void leavesBlock(RegistryObject<Block> blockRegistryObject) {
+        simpleBlockWithItem(blockRegistryObject.get(),
+                models().singleTexture(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get())).getPath(), new ResourceLocation("minecraft:block/leaves"),
+                        "all", blockTexture(blockRegistryObject.get())).renderType("cutout"));
     }
 
     public void makeCrop(CropBlock block, String modelName, String textureName) {

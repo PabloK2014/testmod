@@ -4,7 +4,6 @@ package net.xach.testmod.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.xach.testmod.TestMod;
@@ -20,6 +19,12 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
+        this.tag(BlockTags.LOGS_THAT_BURN)
+                .add(ModBlocks.MAGIC_LOG.get())
+                .add(ModBlocks.MAGIC_WOOD.get())
+                .add(ModBlocks.STRIPPED_MAGIC_LOG.get())
+                .add(ModBlocks.STRIPPED_MAGIC_WOOD.get());
+
 
     }
 }
