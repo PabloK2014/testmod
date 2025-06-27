@@ -1,0 +1,39 @@
+# Eclipse
+bin/
+*.launch
+.settings/
+.metadata
+.classpath
+.project
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Gradle
+.gradle/
+build/
+wrapper/dists/
+caches/
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+# Minecraft/Forge
+run/
+forge*changelog.txt
+saves/
+crash-reports/
+logs/
+*.log
+
+# Другие временные файлы
+*.tmp
+*.bak
+*.swp
+*~
+
+# Локальные конфигурации
+local.properties

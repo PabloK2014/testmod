@@ -1,0 +1,6 @@
+{
+  "item.testmod.strawberry": "Клубничка",
+  "item.testmod.strawberry_seeds": "Семена клубники",
+  "itemGroup.testmod": "Тестовый Мод",
+  "block.testmod.strawberry_crop": "Клубничная грядка"
+}
