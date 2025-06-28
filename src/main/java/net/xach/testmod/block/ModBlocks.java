@@ -1,23 +1,29 @@
 package net.xach.testmod.block;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.xach.testmod.TestMod;
-import net.xach.testmod.block.custom.ModFlammableRotatedPillarBlock;
 import net.xach.testmod.items.ModItems;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
+import net.xach.testmod.block.custom.ModFlammableRotatedPillarBlock;
+import net.xach.testmod.worldgen.ModConfiguredFeatures;
+import net.xach.testmod.worldgen.tree.ModTreeGrowers;
+
 import java.util.function.Supplier;
+
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, TestMod.MOD_ID);
@@ -70,9 +76,10 @@ public class ModBlocks {
                 }
             });
 
-    public static final RegistryObject<Block> MAGIC_SAPLING = registerBlock("magic_sapling",
-            () -> new SaplingBlock(ModTreeGrowers.MAGIC, BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
 
+
+    public static final RegistryObject<Block> MAGIC_SAPLING = BLOCKS.register("magic_sapling",
+            () -> new SaplingBlock(new ModTreeGrowers(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

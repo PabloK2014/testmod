@@ -13,25 +13,24 @@ import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSi
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.ForkingTrunkPlacer;
-
 import net.xach.testmod.TestMod;
 import net.xach.testmod.block.ModBlocks;
 
 public class ModConfiguredFeatures {
 
-    public static final ResourceKey<ConfiguredFeature<?, ?>> MAGIC_KEY = registerKey("magic");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> MAGIC_TREE = registerKey("magic_tree");
 
     public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
+        register(context, MAGIC_TREE, Feature.TREE, createMagicTree().build());
+    }
 
-        register(context, MAGIC_KEY, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
+    private static TreeConfiguration.TreeConfigurationBuilder createMagicTree() {
+        return new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider.simple(ModBlocks.MAGIC_LOG.get()),
                 new ForkingTrunkPlacer(4, 4, 3),
-
                 BlockStateProvider.simple(ModBlocks.MAGIC_LEAVES.get()),
                 new BlobFoliagePlacer(ConstantInt.of(3), ConstantInt.of(3), 3),
-
-                new TwoLayersFeatureSize(1, 0, 2)).build());
-
+                new TwoLayersFeatureSize(1, 0, 2));
     }
 
     public static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {
@@ -43,4 +42,3 @@ public class ModConfiguredFeatures {
         context.register(key, new ConfiguredFeature<>(feature, configuration));
     }
 }
-

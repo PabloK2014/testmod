@@ -69,6 +69,11 @@ public class TestMod {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.STRAWBERRY.get());
                         output.accept(ModItems.STRAWBERRY_SEEDS.get());
+                        output.accept(ModBlocks.MAGIC_SAPLING.get());
+                        output.accept(ModBlocks.MAGIC_LOG.get());
+                        output.accept(ModBlocks.MAGIC_LEAVES.get());
+                        output.accept(ModBlocks.MAGIC_PLANKS.get());
+                        output.accept(ModBlocks.MAGIC_WOOD.get());
                         LOGGER.info("Added Strawberry to TestMod tab");
                     })
                     .build());

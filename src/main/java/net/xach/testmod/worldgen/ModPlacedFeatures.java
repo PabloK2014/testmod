@@ -1,26 +1,32 @@
 package net.xach.testmod.worldgen;
 
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.xach.testmod.TestMod;
 
 import java.util.List;
 
 public class ModPlacedFeatures {
-
+    public static final ResourceKey<PlacedFeature> MAGIC_PLACED = registerKey("magic_placed");
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         var configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
+        register(context, MAGIC_PLACED, configuredFeatures.getOrThrow(ModConfiguredFeatures.MAGIC_TREE),
+                List.of(
+                        RarityFilter.onAverageOnceEvery(16), // Редкость генерации
+                        InSquarePlacement.spread(), // Равномерное распределение в чанке
+                        BiomeFilter.biome() // Проверка биома
+                ));
     }
 
     private static ResourceKey<PlacedFeature> registerKey(String name) {
