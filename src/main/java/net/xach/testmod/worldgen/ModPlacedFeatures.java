@@ -23,9 +23,9 @@ public class ModPlacedFeatures {
 
         register(context, MAGIC_PLACED, configuredFeatures.getOrThrow(ModConfiguredFeatures.MAGIC_TREE),
                 List.of(
-                        RarityFilter.onAverageOnceEvery(16), // Редкость генерации
-                        InSquarePlacement.spread(), // Равномерное распределение в чанке
-                        BiomeFilter.biome() // Проверка биома
+                        RarityFilter.onAverageOnceEvery(1),
+                        InSquarePlacement.spread(),
+                        BiomeFilter.biome()
                 ));
     }
 

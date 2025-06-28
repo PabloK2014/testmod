@@ -1,0 +1,4 @@
+// 1.20	2025-06-29T02:23:41.7803701	Registries
+78e09380e0ee9956dd84638bf16e587f4ada6230 data/testmod/forge/biome_modifier/add_magic_tree.json
+b98e0c24a80bb6d2b3751d73aeac24ac242627d9 data/testmod/worldgen/configured_feature/magic_tree.json
+c9eb06eae0b6afbbd204495caac0f1e3077ceaa1 data/testmod/worldgen/placed_feature/magic_placed.json

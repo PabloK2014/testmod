@@ -39,6 +39,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import net.xach.testmod.block.ModBlocks;
 import net.xach.testmod.items.ModItems;
+import net.xach.testmod.worldgen.ModBiomeModifiers;
 import org.apache.logging.log4j.LogManager; // Используем Log4j
 import org.apache.logging.log4j.Logger;
 
@@ -49,13 +50,14 @@ import java.util.Map;
 @Mod(TestMod.MOD_ID)
 public class TestMod {
     public static final String MOD_ID = "testmod";
-    private static final Logger LOGGER = LogManager.getLogger(MOD_ID); // Заменили на Log4j
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID); // Заменили на Log4j
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
+
     );
 
 
@@ -69,12 +71,12 @@ public class TestMod {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.STRAWBERRY.get());
                         output.accept(ModItems.STRAWBERRY_SEEDS.get());
-                        output.accept(ModBlocks.MAGIC_SAPLING.get());
                         output.accept(ModBlocks.MAGIC_LOG.get());
                         output.accept(ModBlocks.MAGIC_LEAVES.get());
                         output.accept(ModBlocks.MAGIC_PLANKS.get());
                         output.accept(ModBlocks.MAGIC_WOOD.get());
-                        LOGGER.info("Added Strawberry to TestMod tab");
+                        output.accept(ModBlocks.MAGIC_SAPLING.get());
+                        TestMod.LOGGER.info("Added items to TestMod tab");
                     })
                     .build());
 
@@ -86,6 +88,7 @@ public class TestMod {
         MenuRegistry.register(bus);
         ModBlocks.register(bus);
         ModItems.register(bus);
+        ModBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(bus);
         CREATIVE_TABS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(WarSkillHandler.class);
