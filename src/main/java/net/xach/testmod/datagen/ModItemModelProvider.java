@@ -8,8 +8,8 @@ import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import net.xach.testmod.TestMod;
-import net.xach.testmod.block.ModBlocks;
-import net.xach.testmod.items.ModItems;
+import net.xach.testmod.block.TestModBlocks;
+import net.xach.testmod.items.TestModItems;
 
 
 
@@ -21,9 +21,9 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        basicItem(ModItems.STRAWBERRY.get());
-        basicItem(ModItems.STRAWBERRY_SEEDS.get());
-        saplingItem(ModBlocks.MAGIC_SAPLING);
+        basicItem(TestModItems.STRAWBERRY.get());
+        basicItem(TestModItems.STRAWBERRY_SEEDS.get());
+        saplingItem(TestModBlocks.MAGIC_SAPLING);
     }
 
     private ItemModelBuilder saplingItem(RegistryObject<Block> item) {

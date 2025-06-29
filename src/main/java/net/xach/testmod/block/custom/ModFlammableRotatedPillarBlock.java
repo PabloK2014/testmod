@@ -8,7 +8,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ToolAction;
-import net.xach.testmod.block.ModBlocks;
+import net.xach.testmod.block.TestModBlocks;
 
 import javax.annotation.Nullable;
 
@@ -35,12 +35,12 @@ public class ModFlammableRotatedPillarBlock extends RotatedPillarBlock {
     @Override
     public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
         if(context.getItemInHand().getItem() instanceof AxeItem) {
-            if(state.is(ModBlocks.MAGIC_LOG.get())) {
-                return ModBlocks.STRIPPED_MAGIC_LOG.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
+            if(state.is(TestModBlocks.MAGIC_LOG.get())) {
+                return TestModBlocks.STRIPPED_MAGIC_LOG.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
             }
 
-            if(state.is(ModBlocks.MAGIC_WOOD.get())) {
-                return ModBlocks.STRIPPED_MAGIC_WOOD.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
+            if(state.is(TestModBlocks.MAGIC_WOOD.get())) {
+                return TestModBlocks.STRIPPED_MAGIC_WOOD.get().defaultBlockState().setValue(AXIS, state.getValue(AXIS));
             }
         }
 

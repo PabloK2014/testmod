@@ -10,9 +10,8 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.xach.testmod.items.ModItems;
+import net.xach.testmod.items.TestModItems;
 
 import javax.annotation.Nullable;
 
@@ -27,7 +26,7 @@ public class StrawberryCrop extends CropBlock {
 
     @Override
     protected ItemLike getBaseSeedId() {
-        return ModItems.STRAWBERRY_SEEDS.get();
+        return TestModItems.STRAWBERRY_SEEDS.get();
     }
 
     @Override

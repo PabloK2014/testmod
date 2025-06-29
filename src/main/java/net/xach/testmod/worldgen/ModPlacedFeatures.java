@@ -3,6 +3,8 @@ package net.xach.testmod.worldgen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -12,6 +14,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.xach.testmod.TestMod;
+import net.xach.testmod.block.TestModBlocks;
 
 import java.util.List;
 
@@ -22,11 +25,8 @@ public class ModPlacedFeatures {
         var configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 
         register(context, MAGIC_PLACED, configuredFeatures.getOrThrow(ModConfiguredFeatures.MAGIC_TREE),
-                List.of(
-                        RarityFilter.onAverageOnceEvery(1),
-                        InSquarePlacement.spread(),
-                        BiomeFilter.biome()
-                ));
+                VegetationPlacements.treePlacement(PlacementUtils.countExtra(0, 0.02f, 2),
+                        TestModBlocks.MAGIC_SAPLING.get()));
     }
 
     private static ResourceKey<PlacedFeature> registerKey(String name) {

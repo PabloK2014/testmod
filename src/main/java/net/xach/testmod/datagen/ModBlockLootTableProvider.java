@@ -11,9 +11,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.registries.RegistryObject;
-import net.xach.testmod.block.ModBlocks;
+import net.xach.testmod.block.TestModBlocks;
 import net.xach.testmod.block.StrawberryCrop;
-import net.xach.testmod.items.ModItems;
+import net.xach.testmod.items.TestModItems;
 
 
 import java.util.Map;
@@ -33,21 +33,21 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
 
-        LootItemCondition.Builder lootItemConditionBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.STRAWBERRY_CROP.get())
+        LootItemCondition.Builder lootItemConditionBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(TestModBlocks.STRAWBERRY_CROP.get())
                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(StrawberryCrop.AGE, StrawberryCrop.MAX_AGE));
 
-        this.add(ModBlocks.STRAWBERRY_CROP.get(), this.createCropDrops(ModBlocks.STRAWBERRY_CROP.get(),
-                ModItems.STRAWBERRY.get(), ModItems.STRAWBERRY_SEEDS.get(), lootItemConditionBuilder));
+        this.add(TestModBlocks.STRAWBERRY_CROP.get(), this.createCropDrops(TestModBlocks.STRAWBERRY_CROP.get(),
+                TestModItems.STRAWBERRY.get(), TestModItems.STRAWBERRY_SEEDS.get(), lootItemConditionBuilder));
 
-        this.dropSelf(ModBlocks.MAGIC_LOG.get());
-        this.dropSelf(ModBlocks.MAGIC_WOOD.get());
-        this.dropSelf(ModBlocks.STRIPPED_MAGIC_LOG.get());
-        this.dropSelf(ModBlocks.STRIPPED_MAGIC_WOOD.get());
-        this.dropSelf(ModBlocks.MAGIC_PLANKS.get());
-        this.dropSelf(ModBlocks.MAGIC_SAPLING.get());
+        this.dropSelf(TestModBlocks.MAGIC_LOG.get());
+        this.dropSelf(TestModBlocks.MAGIC_WOOD.get());
+        this.dropSelf(TestModBlocks.STRIPPED_MAGIC_LOG.get());
+        this.dropSelf(TestModBlocks.STRIPPED_MAGIC_WOOD.get());
+        this.dropSelf(TestModBlocks.MAGIC_PLANKS.get());
+        this.dropSelf(TestModBlocks.MAGIC_SAPLING.get());
 
-        this.add(ModBlocks.MAGIC_LEAVES.get(), block ->
-                createLeavesDrops(block, ModBlocks.MAGIC_SAPLING.get(), NORMAL_LEAVES_SAPLING_CHANCES));
+        this.add(TestModBlocks.MAGIC_LEAVES.get(), block ->
+                createLeavesDrops(block, TestModBlocks.MAGIC_SAPLING.get(), NORMAL_LEAVES_SAPLING_CHANCES));
     }
 
 
@@ -56,6 +56,6 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
-        return ModBlocks.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
+        return TestModBlocks.BLOCKS.getEntries().stream().map(RegistryObject::get)::iterator;
     }
 }

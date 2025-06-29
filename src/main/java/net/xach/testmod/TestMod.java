@@ -1,7 +1,6 @@
 package net.xach.testmod;
 
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.core.registries.Registries; // Добавляем для CREATIVE_MODE_TAB
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -12,8 +11,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,11 +32,12 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
-import net.xach.testmod.block.ModBlocks;
-import net.xach.testmod.items.ModItems;
+import net.xach.testmod.block.TestModBlocks;
+import net.xach.testmod.items.TestModItems;
+import net.xach.testmod.tab.CreativeTabTestMod;
 import net.xach.testmod.worldgen.ModBiomeModifiers;
+import net.xach.testmod.worldgen.ModConfiguredFeatures;
+import net.xach.testmod.worldgen.ModPlacedFeatures;
 import org.apache.logging.log4j.LogManager; // Используем Log4j
 import org.apache.logging.log4j.Logger;
 
@@ -60,36 +58,17 @@ public class TestMod {
 
     );
 
-
-    public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
-            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
-
-    public static final RegistryObject<CreativeModeTab> TESTMOD_TAB = CREATIVE_TABS.register("testmod_tab",
-            () -> CreativeModeTab.builder()
-                    .title(Component.translatable("itemGroup.testmod"))
-                    .icon(() -> new ItemStack(ModItems.STRAWBERRY.get()))
-                    .displayItems((parameters, output) -> {
-                        output.accept(ModItems.STRAWBERRY.get());
-                        output.accept(ModItems.STRAWBERRY_SEEDS.get());
-                        output.accept(ModBlocks.MAGIC_LOG.get());
-                        output.accept(ModBlocks.MAGIC_LEAVES.get());
-                        output.accept(ModBlocks.MAGIC_PLANKS.get());
-                        output.accept(ModBlocks.MAGIC_WOOD.get());
-                        output.accept(ModBlocks.MAGIC_SAPLING.get());
-                        TestMod.LOGGER.info("Added items to TestMod tab");
-                    })
-                    .build());
-
     public TestMod() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(this::clientSetup);
         bus.addListener(this::registerCapabilities);
         bus.addListener(this::setup);
         MenuRegistry.register(bus);
-        ModBlocks.register(bus);
-        ModItems.register(bus);
+        TestModBlocks.BLOCKS.register(bus);
+        TestModItems.ITEMS.register(bus);
+
+        CreativeTabTestMod.CREATIVE_MODE_TABS.register(bus);
         ModBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(bus);
-        CREATIVE_TABS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(WarSkillHandler.class);
 

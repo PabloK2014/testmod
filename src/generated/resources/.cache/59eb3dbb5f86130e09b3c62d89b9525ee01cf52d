@@ -1,8 +1,8 @@
-// 1.20	2025-06-29T00:48:52.6640784	Loot Tables
-818d189ac5941e8ae686c30fa336207a7baeb009 data/testmod/loot_tables/blocks/magic_leaves.json
+// 1.20	2025-06-29T22:39:02.6108513	Loot Tables
+dd400e617023ec8f2c644e80243987989463b1e6 data/testmod/loot_tables/blocks/magic_leaves.json
 d6791d26ca74bc2539d2fb0df287f8f3b032749c data/testmod/loot_tables/blocks/magic_log.json
 779a2c33a1ea11b192f16610a39754999f50d083 data/testmod/loot_tables/blocks/magic_planks.json
-889301d645d707920418774c6bb00013c6e7fb80 data/testmod/loot_tables/blocks/magic_sapling.json
+de5d24708e256d98a2c67821e8060c416fbb6c76 data/testmod/loot_tables/blocks/magic_sapling.json
 f7924250798128b5613dca0073c505be68f702d1 data/testmod/loot_tables/blocks/magic_wood.json
 6aa31b3277ae82aa03eb4087be0547e0d3308904 data/testmod/loot_tables/blocks/strawberry_crop.json
 3d07351daea0a8e814bb164034675c36b1ad8c46 data/testmod/loot_tables/blocks/stripped_magic_log.json

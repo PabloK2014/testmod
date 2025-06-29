@@ -1,4 +1,4 @@
-// 1.20	2025-06-29T02:23:41.7803701	Registries
-78e09380e0ee9956dd84638bf16e587f4ada6230 data/testmod/forge/biome_modifier/add_magic_tree.json
-b98e0c24a80bb6d2b3751d73aeac24ac242627d9 data/testmod/worldgen/configured_feature/magic_tree.json
-c9eb06eae0b6afbbd204495caac0f1e3077ceaa1 data/testmod/worldgen/placed_feature/magic_placed.json
+// 1.20	2025-06-29T23:40:40.9666175	Registries
+4cca9e89600b4ed503f4e7d5ed1478ce4b7df3b4 data/testmod/forge/biome_modifier/add_magic_tree.json
+cc58a3c77c0e53bae576a5996da40f2782244d25 data/testmod/worldgen/configured_feature/magic_tree.json
+c07fee93d9b01c42f561555e08cc8fef6b2c8197 data/testmod/worldgen/placed_feature/magic_placed.json

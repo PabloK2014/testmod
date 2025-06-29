@@ -12,25 +12,26 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.ForkingTrunkPlacer;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
 import net.xach.testmod.TestMod;
-import net.xach.testmod.block.ModBlocks;
+import net.xach.testmod.block.TestModBlocks;
 
 public class ModConfiguredFeatures {
 
     public static final ResourceKey<ConfiguredFeature<?, ?>> MAGIC_TREE = registerKey("magic_tree");
 
     public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
-        register(context, MAGIC_TREE, Feature.TREE, createMagicTree().build());
+        register(context, MAGIC_TREE, Feature.TREE, createOakLikeTree().build());
     }
 
-    private static TreeConfiguration.TreeConfigurationBuilder createMagicTree() {
+    private static TreeConfiguration.TreeConfigurationBuilder createOakLikeTree() {
         return new TreeConfiguration.TreeConfigurationBuilder(
-                BlockStateProvider.simple(ModBlocks.MAGIC_LOG.get()),
-                new ForkingTrunkPlacer(4, 4, 3),
-                BlockStateProvider.simple(ModBlocks.MAGIC_LEAVES.get()),
-                new BlobFoliagePlacer(ConstantInt.of(3), ConstantInt.of(3), 3),
-                new TwoLayersFeatureSize(1, 0, 2));
+                BlockStateProvider.simple(TestModBlocks.MAGIC_LOG.get()), // Ваш кастомный ствол
+                new StraightTrunkPlacer(6, 2, 0), // Высота ствола: 4 базовых + до 2 дополнительных
+                BlockStateProvider.simple(TestModBlocks.MAGIC_LEAVES.get()), // Ваша кастомная листва
+                new BlobFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0), 2), // Крона как у дуба
+                new TwoLayersFeatureSize(3, 0, 1) // Размер как у дуба
+        );
     }
 
     public static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {

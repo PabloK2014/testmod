@@ -1,30 +1,25 @@
 package net.xach.testmod.block;
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.xach.testmod.TestMod;
-import net.xach.testmod.items.ModItems;
+import net.xach.testmod.items.TestModItems;
 import net.xach.testmod.block.custom.ModFlammableRotatedPillarBlock;
-import net.xach.testmod.worldgen.ModConfiguredFeatures;
 import net.xach.testmod.worldgen.tree.ModTreeGrowers;
 
 import java.util.function.Supplier;
 
-public class ModBlocks {
+public class TestModBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, TestMod.MOD_ID);
 
@@ -88,10 +83,6 @@ public class ModBlocks {
     }
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
-    }
-
-    public static void register(IEventBus eventBus) {
-        BLOCKS.register(eventBus);
+        TestModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 }

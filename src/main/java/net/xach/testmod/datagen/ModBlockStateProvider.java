@@ -12,7 +12,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.xach.testmod.TestMod;
-import net.xach.testmod.block.ModBlocks;
+import net.xach.testmod.block.TestModBlocks;
 import net.xach.testmod.block.StrawberryCrop;
 
 import java.util.Objects;
@@ -25,22 +25,22 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        makeCrop(((CropBlock) ModBlocks.STRAWBERRY_CROP.get()), "strawberry_crop_stage", "strawberry_crop_stage");
+        makeCrop(((CropBlock) TestModBlocks.STRAWBERRY_CROP.get()), "strawberry_crop_stage", "strawberry_crop_stage");
 
-        logBlock(ModBlocks.MAGIC_LOG.get());
-        axisBlock(ModBlocks.MAGIC_WOOD.get(), blockTexture(ModBlocks.MAGIC_LOG.get()), blockTexture(ModBlocks.MAGIC_LOG.get()));
-        logBlock(ModBlocks.STRIPPED_MAGIC_LOG.get());
-        axisBlock(ModBlocks.STRIPPED_MAGIC_WOOD.get(), blockTexture(ModBlocks.STRIPPED_MAGIC_LOG.get()), blockTexture(ModBlocks.STRIPPED_MAGIC_LOG.get()));
+        logBlock(TestModBlocks.MAGIC_LOG.get());
+        axisBlock(TestModBlocks.MAGIC_WOOD.get(), blockTexture(TestModBlocks.MAGIC_LOG.get()), blockTexture(TestModBlocks.MAGIC_LOG.get()));
+        logBlock(TestModBlocks.STRIPPED_MAGIC_LOG.get());
+        axisBlock(TestModBlocks.STRIPPED_MAGIC_WOOD.get(), blockTexture(TestModBlocks.STRIPPED_MAGIC_LOG.get()), blockTexture(TestModBlocks.STRIPPED_MAGIC_LOG.get()));
 
-        blockItem(ModBlocks.MAGIC_LOG);
-        blockItem(ModBlocks.MAGIC_WOOD);
-        blockItem(ModBlocks.STRIPPED_MAGIC_LOG);
-        blockItem(ModBlocks.STRIPPED_MAGIC_WOOD);
+        blockItem(TestModBlocks.MAGIC_LOG);
+        blockItem(TestModBlocks.MAGIC_WOOD);
+        blockItem(TestModBlocks.STRIPPED_MAGIC_LOG);
+        blockItem(TestModBlocks.STRIPPED_MAGIC_WOOD);
 
-        blockWithItem(ModBlocks.MAGIC_PLANKS);
+        blockWithItem(TestModBlocks.MAGIC_PLANKS);
 
-        leavesBlock(ModBlocks.MAGIC_LEAVES);
-        saplingBlock(ModBlocks.MAGIC_SAPLING);
+        leavesBlock(TestModBlocks.MAGIC_LEAVES);
+        saplingBlock(TestModBlocks.MAGIC_SAPLING);
     }
 
 
