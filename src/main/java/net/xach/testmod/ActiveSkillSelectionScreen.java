@@ -12,7 +12,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @OnlyIn(Dist.CLIENT)
 public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSkillSelectionMenu> {
 
@@ -48,6 +47,11 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
                     if (cap.getSkillLevel("mad_boost") > 0) availableSkills.add("mad_boost");
                     if (cap.getSkillLevel("indestructibility") > 0) availableSkills.add("indestructibility");
                     if (cap.getSkillLevel("dagestan") > 0) availableSkills.add("dagestan");
+                } else if (playerClass.equals("miner")) {
+                    if (cap.getSkillLevel("ore_highlight") > 0) availableSkills.add("ore_highlight");
+                    if (cap.getSkillLevel("vein_miner") > 0) availableSkills.add("vein_miner");
+                    if (cap.getSkillLevel("night_vision") > 0) availableSkills.add("night_vision");
+                    if (cap.getSkillLevel("instant_repair") > 0) availableSkills.add("instant_repair");
                 }
 
                 // Создаем кнопки для каждого доступного навыка
@@ -63,6 +67,11 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
                         case "mad_boost" -> "Безумный Рывок";
                         case "indestructibility" -> "Несокрушимость";
                         case "dagestan" -> "Дагестанская братва";
+                        // Навыки для miner
+                        case "ore_highlight" -> "Подсветка руды";
+                        case "vein_miner" -> "Жилокопатель";
+                        case "night_vision" -> "Ночное зрение";
+                        case "instant_repair" -> "Мгновенный ремонт";
                         default -> skillId;
                     };
                     this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(

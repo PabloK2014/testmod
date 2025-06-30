@@ -1,7 +1,6 @@
 package net.xach.testmod;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -12,7 +11,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @OnlyIn(Dist.CLIENT)
 public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
@@ -57,11 +55,14 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                         tabs.add(new SkillTab(0, Component.literal("Гурман"), skillTree.getBranches().get(0), cap));
                         tabs.add(new SkillTab(1, Component.literal("Огненная кухня"), skillTree.getBranches().get(1), cap));
                         tabs.add(new SkillTab(2, Component.literal("Ресторанный критик"), skillTree.getBranches().get(2), cap));
+                    } else if (playerClass.equals("miner")) {
+                        tabs.add(new SkillTab(0, Component.literal("Добыча"), skillTree.getBranches().get(0), cap));
+                        tabs.add(new SkillTab(1, Component.literal("Исследование"), skillTree.getBranches().get(1), cap));
+                        tabs.add(new SkillTab(2, Component.literal("Выживание"), skillTree.getBranches().get(2), cap));
                     }
                     selectedTab = tabs.get(Math.min(previousTabIndex, tabs.size() - 1));
                     updateBounds();
                     updateTabButtons();
-
                 }
             });
         }
@@ -124,12 +125,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
             int u = tab == selectedTab ? 0 : 28;
             guiGraphics.blit(TABS_TEXTURE, tabX, tabY, u, 0, 28, 32);
             guiGraphics.drawCenteredString(this.font, tab.title, tabX + 14, tabY + 8, 0xFFFFFF);
-            String tabTitle = switch (tab.title.getString()) {
-                case "Скорость" -> "Skorost";
-                case "Инвентарь" -> "Inventar";
-                case "Грузоподъёмность" -> "Gruzopodyomnost";
-                default -> tab.title.getString();
-            };
         }
 
         if (selectedTab != null) {
@@ -180,12 +175,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
             if (mouseX >= tabX && mouseX < tabX + 28 && mouseY >= tabY && mouseY < tabY + 32) {
                 selectedTab = tabs.get(i);
                 updateTabButtons();
-                String tabTitle = switch (tabs.get(i).title.getString()) {
-                    case "Скорость" -> "Skorost";
-                    case "Инвентарь" -> "Inventar";
-                    case "Грузоподъёмность" -> "Gruzopodyomnost";
-                    default -> tabs.get(i).title.getString();
-                };
                 return true;
             }
         }
@@ -232,7 +221,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 node.button.setX(offsetX + node.x);
                 node.button.setY(offsetY + node.y);
                 this.addRenderableWidget(node.button);
-
             }
         }
     }

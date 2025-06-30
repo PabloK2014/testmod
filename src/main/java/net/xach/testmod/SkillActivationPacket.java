@@ -1,119 +1,99 @@
 package net.xach.testmod;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-
 public class SkillActivationPacket {
-
 
     public SkillActivationPacket() {
     }
 
     public SkillActivationPacket(FriendlyByteBuf buf) {
+        // Пакет не содержит данных
     }
 
     public void toBytes(FriendlyByteBuf buf) {
+        // Пакет не содержит данных
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player == null) {
+    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context context = supplier.get();
+        context.enqueueWork(() -> {
+            ServerPlayer player = context.getSender();
+            if (player != null) {
+                player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
+                    String activeSkill = cap.getActiveSkill();
+                    String playerClass = cap.getPlayerClass();
 
-                return;
-            }
+                    System.out.println("Skill activation packet received from player: " + player.getName().getString() +
+                            ", Active skill: " + activeSkill + ", Class: " + playerClass);
 
-            player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
-                String activeSkill = cap.getActiveSkill();
-                String playerClass = cap.getPlayerClass();
-
-
-                if (activeSkill.isEmpty()) {
-
-                    player.sendSystemMessage(Component.literal("Выберите активный навык в меню (клавиша L)."));
-                    return;
-                }
-
-                if (playerClass.equals("yandex.go")) {
-                    switch (activeSkill) {
-                        case "sprint_boost":
-                            if (cap.getSkillLevel("sprint_boost") > 0 && cap.getSurgeEnergy() >= 20) {
-                                YandexGoSkillHandler.activateSprintBoost(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/20) или навык не изучен."));
-
-                            }
-                            break;
-                        case "speed_surge":
-                            if (cap.getSkillLevel("speed_surge") > 0 && cap.getSurgeEnergy() >= 50) {
-                                YandexGoSkillHandler.activateSpeedSurge(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/50) или навык не изучен."));
-
-                            }
-                            break;
-                        case "inventory_surge":
-                            if (cap.getSkillLevel("inventory_surge") > 0 && cap.getSurgeEnergy() >= 50 && !cap.hasTradeHandler()) {
-                                YandexGoSkillHandler.activateInventorySurge(player, cap);
-                                cap.setTradeHandler(true);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/50), навык не изучен или уже активирован."));
-
-                            }
-                            break;
-                        case "carry_surge":
-                            if (cap.getSkillLevel("carry_surge") > 0 && cap.getSurgeEnergy() >= 50) {
-                                YandexGoSkillHandler.activateCarrySurge(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/50) или навык не изучен."));
-
-                            }
-                            break;
-                        default:
-
-                            player.sendSystemMessage(Component.literal("Неизвестный активный навык: " + activeSkill));
+                    if (activeSkill.isEmpty()) {
+                        player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Активный навык не выбран! Используйте клавишу L для выбора."));
+                        return;
                     }
-                } else if (playerClass.equals("war")) {
-                    switch (activeSkill) {
-                        case "mad_boost":
-                            if (cap.getSkillLevel("mad_boost") > 0 && cap.getSurgeEnergy() >= 20) {
+
+                    // Обработка навыков для класса "war"
+                    if (playerClass.equals("war")) {
+                        switch (activeSkill) {
+                            case "mad_boost":
                                 WarSkillHandler.activateMadBoost(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/20) или навык не изучен."));
-
-                            }
-                            break;
-                        case "indestructibility":
-                            if (cap.getSkillLevel("indestructibility") > 0 && cap.getSurgeEnergy() >= 20 && player.getHealth() <= player.getMaxHealth() * 0.3f) {
+                                break;
+                            case "indestructibility":
                                 WarSkillHandler.activateIndestructibility(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/20), здоровья или навык не изучен."));
-
-                            }
-                            break;
-                        case "dagestan":
-                            if (cap.getSkillLevel("dagestan") > 0 && cap.getSurgeEnergy() >= 50) {
+                                break;
+                            case "dagestan":
                                 WarSkillHandler.activateDagestan(player, cap);
-                            } else {
-                                player.sendSystemMessage(Component.literal("Недостаточно энергии Surge (" + cap.getSurgeEnergy() + "/50) или навык не изучен."));
-
-                            }
-                            break;
-                        default:
-
-                            player.sendSystemMessage(Component.literal("Неизвестный активный навык: " + activeSkill));
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
                     }
-                } else {
-
-                    player.sendSystemMessage(Component.literal("Ваш класс не поддерживает активные навыки."));
-                }
-            });
+                    // Обработка навыков для класса "yandex.go"
+                    else if (playerClass.equals("yandex.go")) {
+                        switch (activeSkill) {
+                            case "sprint_boost":
+                                YandexGoSkillHandler.activateSprintBoost(player, cap);
+                                break;
+                            case "speed_surge":
+                                YandexGoSkillHandler.activateSpeedSurge(player, cap);
+                                break;
+                            case "inventory_surge":
+                                YandexGoSkillHandler.activateInventorySurge(player, cap);
+                                break;
+                            case "carry_surge":
+                                YandexGoSkillHandler.activateCarrySurge(player, cap);
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
+                    }
+                    // Обработка навыков для класса "miner"
+                    else if (playerClass.equals("miner")) {
+                        switch (activeSkill) {
+                            case "ore_highlight":
+                                MinerSkillHandler.activateOreHighlight(player, cap);
+                                break;
+                            case "vein_miner":
+                                MinerSkillHandler.activateVeinMiner(player, cap);
+                                break;
+                            case "night_vision":
+                                MinerSkillHandler.activateNightVision(player, cap);
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
+                    }
+                    // Добавьте обработку для других классов по необходимости
+                    else {
+                        player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Активация навыков для класса " + playerClass + " пока не реализована."));
+                    }
+                });
+            }
         });
-        ctx.get().setPacketHandled(true);
+        return true;
     }
 }

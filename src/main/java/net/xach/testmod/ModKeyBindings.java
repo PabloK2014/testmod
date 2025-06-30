@@ -19,9 +19,16 @@ public class ModKeyBindings {
             "key.categories.testmod"
     );
 
+    public static final KeyMapping TOGGLE_AREA_MINING = new KeyMapping(
+            "key.testmod.toggle_area_mining",
+            77, // M
+            "key.categories.testmod"
+    );
+
     @SubscribeEvent
     public static void registerKeyBindings(RegisterKeyMappingsEvent event) {
         event.register(ACTIVATE_SKILL);
         event.register(OPEN_ACTIVE_SKILL_MENU);
+        event.register(TOGGLE_AREA_MINING);
     }
 }

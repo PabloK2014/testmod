@@ -73,6 +73,8 @@ public class TestMod {
         MinecraftForge.EVENT_BUS.register(WarSkillHandler.class);
 
         registerNetworkPackets();
+
+        System.out.println("TestMod constructor completed, entities should be registered");
     }
 
     private void registerNetworkPackets() {
@@ -85,6 +87,8 @@ public class TestMod {
         NETWORK.registerMessage(id++, SkillActivationPacket.class, SkillActivationPacket::toBytes, SkillActivationPacket::new, SkillActivationPacket::handle);
         NETWORK.registerMessage(id++, SkillUpgradePacket.class, SkillUpgradePacket::toBytes, SkillUpgradePacket::new, SkillUpgradePacket::handle);
         NETWORK.registerMessage(id++, VillageCompassPacket.class, VillageCompassPacket::toBytes, VillageCompassPacket::new, VillageCompassPacket::handle);
+        NETWORK.registerMessage(id++, ToggleAreaMiningPacket.class, ToggleAreaMiningPacket::toBytes, ToggleAreaMiningPacket::new, ToggleAreaMiningPacket::handle);
+        NETWORK.registerMessage(id++, OreHighlightPacket.class, OreHighlightPacket::toBytes, OreHighlightPacket::new, OreHighlightPacket::handle);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -184,7 +188,7 @@ public class TestMod {
         private int level = 1;
         private int experience = 0;
         private int skillPoints = 1;
-        private int surgeEnergy = 1000;
+        private int surgeEnergy = 100;
         private String activeSkill = "";
         private final Map<String, Integer> skillLevels = new HashMap<>();
 
@@ -378,28 +382,35 @@ public class TestMod {
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Воин"),
                             button -> selectClass("war"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 30)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 40)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Повар"),
                             button -> selectClass("cook"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 10)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 20)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Курьер Yandex.Go"),
                             button -> selectClass("yandex.go"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 10)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Пивовар"),
                             button -> selectClass("pivo"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 30)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 20)
+                    .size(buttonWidth, buttonHeight)
+                    .build());
+
+            this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
+                            Component.literal("Шахтёр"),
+                            button -> selectClass("miner"))
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 40)
                     .size(buttonWidth, buttonHeight)
                     .build());
         }
