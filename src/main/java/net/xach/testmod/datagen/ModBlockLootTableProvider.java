@@ -46,8 +46,23 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         this.dropSelf(TestModBlocks.MAGIC_PLANKS.get());
         this.dropSelf(TestModBlocks.MAGIC_SAPLING.get());
 
+        this.dropSelf(TestModBlocks.MAGIC_STAIRS.get());
+        this.dropSelf(TestModBlocks.MAGIC_SLAB.get());
+        this.dropSelf(TestModBlocks.MAGIC_PRESSURE_PLATE.get());
+        this.dropSelf(TestModBlocks.MAGIC_BUTTON.get());
+        this.dropSelf(TestModBlocks.MAGIC_FENCE.get());
+        this.dropSelf(TestModBlocks.MAGIC_FENCE_GATE.get());
+        this.dropSelf(TestModBlocks.MAGIC_TRAPDOOR.get());
+
+        // Для двери нужен специальный лут (дверь дропает только нижняя часть)
+        this.add(TestModBlocks.MAGIC_DOOR.get(), block ->
+                createDoorTable(TestModBlocks.MAGIC_DOOR.get()));
+
         this.add(TestModBlocks.MAGIC_LEAVES.get(), block ->
                 createLeavesDrops(block, TestModBlocks.MAGIC_SAPLING.get(), NORMAL_LEAVES_SAPLING_CHANCES));
+
+        // Ловушка не дропает ничего при разрушении
+        this.add(TestModBlocks.TRAP_BLOCK.get(), noDrop());
     }
 
 

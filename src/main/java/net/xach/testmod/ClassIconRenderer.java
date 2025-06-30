@@ -18,19 +18,18 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
+
 
 @Mod.EventBusSubscriber(modid = TestMod.MOD_ID, value = Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
 public class ClassIconRenderer {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
     private static float currentExpWidth = 0;
     private static float currentEnergyWidth = 0;
     private static float currentHealthWidth = 0;
     private static float lastHealth = 20.0f;
     private static float damageFlashTime = 0;
     private static final ResourceLocation CUSTOM_HP_TEXTURE = new ResourceLocation(TestMod.MOD_ID, "textures/gui/customhp.png");
-    private static final int CUSTOM_HP_COLOR = 0xFF6B03FC; // Фиолетовый цвет для запасного варианта
+    private static final int CUSTOM_HP_COLOR = 0xFF6B03FC;
 
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
@@ -39,9 +38,7 @@ public class ClassIconRenderer {
             if (minecraft.player != null) {
                 minecraft.player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
                     String playerClass = cap.getPlayerClass();
-                    LOGGER.info("Screen init, player class: " + playerClass);
                     if (!playerClass.isEmpty()) {
-                        LOGGER.info("Initializing screen for class: " + playerClass);
                         int iconX = screen.getGuiLeft() - 26;
                         int iconY = screen.getGuiTop() + 20;
                         int iconWidth = 16;
@@ -57,7 +54,6 @@ public class ClassIconRenderer {
                         event.addListener(Button.builder(
                                         Component.literal("Навыки"),
                                         button -> {
-                                            LOGGER.info("Skills button clicked for class: " + playerClass);
                                             TestMod.NETWORK.sendToServer(new OpenSkillTreePacket());
                                         }
                                 )
@@ -65,7 +61,6 @@ public class ClassIconRenderer {
                                 .size(buttonWidth, buttonHeight)
                                 .build());
                     } else {
-                        LOGGER.warning("No class selected during screen init, adding test button");
                         // Тестовая кнопка для открытия выбора класса
                         int buttonX = screen.getGuiLeft() + 130;
                         int buttonY = screen.getGuiTop() + 20;
@@ -82,7 +77,6 @@ public class ClassIconRenderer {
                     }
                 });
             } else {
-                LOGGER.warning("Player is null during screen init");
             }
         }
     }
@@ -109,7 +103,6 @@ public class ClassIconRenderer {
                 minecraft.player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
                     String playerClass = cap.getPlayerClass();
                     if (!playerClass.isEmpty()) {
-                        LOGGER.info("Rendering icon for class: " + playerClass + " (bytes: " + playerClass.getBytes(StandardCharsets.UTF_8).length + ")");
                         int iconX = screen.getGuiLeft() - 26;
                         int iconY = screen.getGuiTop() + 20;
                         int iconWidth = 16;
@@ -119,11 +112,9 @@ public class ClassIconRenderer {
                         RenderSystem.setShaderTexture(0, iconTexture);
                         guiGraphics.blit(iconTexture, iconX, iconY, 0, 0, iconWidth, iconHeight, iconWidth, iconHeight);
                     } else {
-                        LOGGER.warning("No class selected during render");
                     }
                 });
             } else {
-                LOGGER.warning("Player is null during render");
             }
         }
 
@@ -207,7 +198,6 @@ public class ClassIconRenderer {
             float flash = (float) (0.4 + 0.6 * Math.sin(System.currentTimeMillis() / 70.0)); // Увеличенная амплитуда и скорость
             int flashColor = (int) (flash * 255) << 24 | 0xFF0000; // Красная вспышка
             guiGraphics.fill(x, y, x + barWidth, y + barHeight, flashColor);
-            LOGGER.info("Rendering damage flash, alpha: " + (int) (flash * 255));
         }
 
         guiGraphics.fill(x, y, x + barWidth, y + barHeight, 0x80000000);
@@ -226,7 +216,6 @@ public class ClassIconRenderer {
             int brightG = (int) (g * (0.6 + 0.4 * pulse));
             int brightB = (int) (b * (0.6 + 0.4 * pulse));
             healthColor = (alpha << 24) | (brightR << 16) | (brightG << 8) | brightB;
-            LOGGER.info("Rendering full health pulse, alpha: " + alpha + ", color: " + Integer.toHexString(healthColor));
         }
 
         // Рендеринг текстуры или запасного цвета
@@ -265,7 +254,7 @@ public class ClassIconRenderer {
         }
 
         lastHealth = health;
-        LOGGER.info("Rendering HP bar at x=" + x + ", y=" + y + ", health=" + health + ", width=" + currentHealthWidth);
+
     }
 
     private static ResourceLocation getIconTexture(String playerClass) {
@@ -277,12 +266,12 @@ public class ClassIconRenderer {
             default -> "textures/gui/unknown.png";
         };
         ResourceLocation texture = new ResourceLocation(TestMod.MOD_ID, texturePath);
-        LOGGER.info("Loading texture: " + texture + " for class: " + playerClass);
+
         try {
             Minecraft.getInstance().getResourceManager().getResource(texture).orElseThrow();
-            LOGGER.info("Texture found: " + texture);
+
         } catch (Exception e) {
-            LOGGER.warning("Texture not found: " + texture);
+
         }
         return texture;
     }

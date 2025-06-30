@@ -45,20 +45,24 @@ public class ModDataGenerator {
         generator.addProvider(event.includeClient(), new ModItemModelProvider(packOutput, existingFileHelper));
         generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, existingFileHelper));
 
+        // Добавляем провайдер рецептов
+        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput));
+
+        // Добавляем провайдер тегов предметов
+        generator.addProvider(event.includeServer(), new ModItemTagProvider(packOutput, lookupProvider,
+                blockTagsProvider.contentsGetter(), existingFileHelper));
+
         generator.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(
                 packOutput,
                 lookupProvider,
                 new RegistrySetBuilder()
                         .add(Registries.CONFIGURED_FEATURE, context -> {
-                            TestMod.LOGGER.info("Generating ConfiguredFeatures");
                             ModConfiguredFeatures.bootstrap(context);
                         })
                         .add(Registries.PLACED_FEATURE, context -> {
-                            TestMod.LOGGER.info("Generating PlacedFeatures");
                             ModPlacedFeatures.bootstrap(context);
                         })
                         .add(net.minecraftforge.registries.ForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
-                            TestMod.LOGGER.info("Generating BiomeModifiers");
                             ModBiomeModifiers.bootstrap(context);}),
                 Set.of(TestMod.MOD_ID)
         ));

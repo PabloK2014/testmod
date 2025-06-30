@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -33,29 +34,26 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.xach.testmod.block.TestModBlocks;
+import net.xach.testmod.entity.ModEntities;
 import net.xach.testmod.items.TestModItems;
 import net.xach.testmod.tab.CreativeTabTestMod;
 import net.xach.testmod.worldgen.ModBiomeModifiers;
-import net.xach.testmod.worldgen.ModConfiguredFeatures;
-import net.xach.testmod.worldgen.ModPlacedFeatures;
-import org.apache.logging.log4j.LogManager; // Используем Log4j
-import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraftforge.event.TickEvent;
 
 @Mod(TestMod.MOD_ID)
 public class TestMod {
     public static final String MOD_ID = "testmod";
-    public static final Logger LOGGER = LogManager.getLogger(MOD_ID); // Заменили на Log4j
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel NETWORK = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
-
     );
 
     public TestMod() {
@@ -63,52 +61,35 @@ public class TestMod {
         bus.addListener(this::clientSetup);
         bus.addListener(this::registerCapabilities);
         bus.addListener(this::setup);
+
         MenuRegistry.register(bus);
         TestModBlocks.BLOCKS.register(bus);
         TestModItems.ITEMS.register(bus);
+        ModEntities.register(bus); // Добавляем регистрацию сущностей
 
         CreativeTabTestMod.CREATIVE_MODE_TABS.register(bus);
         ModBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(WarSkillHandler.class);
 
+        registerNetworkPackets();
+    }
+
+    private void registerNetworkPackets() {
         int id = 0;
         NETWORK.registerMessage(id++, ClassSelectionPacket.class, ClassSelectionPacket::toBytes, ClassSelectionPacket::new, ClassSelectionPacket::handle);
         NETWORK.registerMessage(id++, PlayerDataSyncPacket.class, PlayerDataSyncPacket::toBytes, PlayerDataSyncPacket::new, PlayerDataSyncPacket::handle);
         NETWORK.registerMessage(id++, OpenSkillTreePacket.class, OpenSkillTreePacket::toBytes, OpenSkillTreePacket::new, OpenSkillTreePacket::handle);
         NETWORK.registerMessage(id++, ActiveSkillSelectionPacket.class, ActiveSkillSelectionPacket::toBytes, ActiveSkillSelectionPacket::new, ActiveSkillSelectionPacket::handle);
         NETWORK.registerMessage(id++, OpenClassSelectionPacket.class, OpenClassSelectionPacket::toBytes, OpenClassSelectionPacket::new, OpenClassSelectionPacket::handle);
+        NETWORK.registerMessage(id++, SkillActivationPacket.class, SkillActivationPacket::toBytes, SkillActivationPacket::new, SkillActivationPacket::handle);
+        NETWORK.registerMessage(id++, SkillUpgradePacket.class, SkillUpgradePacket::toBytes, SkillUpgradePacket::new, SkillUpgradePacket::handle);
+        NETWORK.registerMessage(id++, VillageCompassPacket.class, VillageCompassPacket::toBytes, VillageCompassPacket::new, VillageCompassPacket::handle);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            LOGGER.info("Registering network packets for channel testmod:main");
-            int id = 0;
-            NETWORK.registerMessage(id++, SkillActivationPacket.class,
-                    SkillActivationPacket::toBytes,
-                    SkillActivationPacket::new,
-                    SkillActivationPacket::handle);
-            NETWORK.registerMessage(id++, ClassSelectionPacket.class,
-                    ClassSelectionPacket::toBytes,
-                    ClassSelectionPacket::new,
-                    ClassSelectionPacket::handle);
-            NETWORK.registerMessage(id++, PlayerDataSyncPacket.class,
-                    PlayerDataSyncPacket::toBytes,
-                    PlayerDataSyncPacket::new,
-                    PlayerDataSyncPacket::handle);
-            NETWORK.registerMessage(id++, SkillUpgradePacket.class,
-                    SkillUpgradePacket::toBytes,
-                    SkillUpgradePacket::new,
-                    SkillUpgradePacket::handle);
-            NETWORK.registerMessage(id++, OpenSkillTreePacket.class,
-                    OpenSkillTreePacket::toBytes,
-                    OpenSkillTreePacket::new,
-                    OpenSkillTreePacket::handle);
-            NETWORK.registerMessage(id++, ActiveSkillSelectionPacket.class,
-                    ActiveSkillSelectionPacket::toBytes,
-                    ActiveSkillSelectionPacket::new,
-                    ActiveSkillSelectionPacket::handle);
-            LOGGER.info("Network packets registered successfully");
+            System.out.println("Common setup completed for " + MOD_ID);
         });
     }
 
@@ -117,6 +98,8 @@ public class TestMod {
             MenuScreens.register(MenuRegistry.CLASS_SELECTION.get(), ClassSelectionScreen::new);
             MenuScreens.register(MenuRegistry.SKILL_TREE.get(), SkillTreeScreen::new);
             MenuScreens.register(MenuRegistry.ACTIVE_SKILL_SELECTION.get(), ActiveSkillSelectionScreen::new);
+            MenuScreens.register(MenuRegistry.FOOD_BAG.get(), FoodBagScreen::new);
+            System.out.println("Client setup completed for " + MOD_ID);
         });
     }
 
@@ -129,20 +112,8 @@ public class TestMod {
         if (!event.getEntity().level().isClientSide()) {
             Player player = event.getEntity();
             player.getCapability(PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
-                LOGGER.info("Player joined with class: " + cap.getPlayerClass() + ", level: " + cap.getLevel() + ", exp: " + cap.getExperience() + ", points: " + cap.getSkillPoints() + ", active skill: " + cap.getActiveSkill());
                 if (cap.getPlayerClass().isEmpty()) {
-                    LOGGER.info("Opening class selection screen for player: " + player.getName().getString());
-                    NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
-                        @Override
-                        public Component getDisplayName() {
-                            return Component.literal("Select Class");
-                        }
-
-                        @Override
-                        public ClassSelectionMenu createMenu(int id, Inventory inv, Player player) {
-                            return new ClassSelectionMenu(id, inv);
-                        }
-                    });
+                    player.sendSystemMessage(Component.literal("Используйте команду /testmod class для выбора класса"));
                 } else {
                     cap.sync((ServerPlayer) player);
                 }
@@ -155,15 +126,15 @@ public class TestMod {
         if (!event.getEntity().level().isClientSide()) {
             Player original = event.getOriginal();
             Player newPlayer = event.getEntity();
-            LOGGER.info("Player clone event triggered for player: " + newPlayer.getName().getString());
+            System.out.println("Player clone event triggered for player: " + newPlayer.getName().getString());
             original.reviveCaps();
             original.getCapability(PlayerClassCapability.CAPABILITY).ifPresent(oldCap -> {
                 newPlayer.getCapability(PlayerClassCapability.CAPABILITY).ifPresent(newCap -> {
                     CompoundTag nbt = oldCap.serializeNBT();
-                    LOGGER.info("Cloning player capability: class=" + oldCap.getPlayerClass() + ", level=" + oldCap.getLevel() + ", exp=" + oldCap.getExperience() + ", points=" + oldCap.getSkillPoints() + ", active skill: " + oldCap.getActiveSkill());
+                    System.out.println("Cloning player capability: class=" + oldCap.getPlayerClass() + ", level=" + oldCap.getLevel() + ", exp=" + oldCap.getExperience() + ", points=" + oldCap.getSkillPoints() + ", active skill: " + oldCap.getActiveSkill());
                     newCap.deserializeNBT(nbt);
                     newCap.sync((ServerPlayer) newPlayer);
-                    LOGGER.info("Cloned to new player: class=" + newCap.getPlayerClass() + ", level=" + newCap.getLevel() + ", exp=" + newCap.getExperience() + ", points=" + newCap.getSkillPoints() + ", active skill: " + newCap.getActiveSkill());
+                    System.out.println("Cloned to new player: class=" + newCap.getPlayerClass() + ", level=" + newCap.getLevel() + ", exp=" + newCap.getExperience() + ", points=" + newCap.getSkillPoints() + ", active skill: " + newCap.getActiveSkill());
                 });
             });
             original.invalidateCaps();
@@ -175,7 +146,7 @@ public class TestMod {
         if (!event.getEntity().level().isClientSide()) {
             ServerPlayer player = (ServerPlayer) event.getEntity();
             player.getCapability(PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
-                LOGGER.info("Player respawned with class: " + cap.getPlayerClass() + ", level: " + cap.getLevel() + ", exp: " + cap.getExperience() + ", points: " + cap.getSkillPoints() + ", active skill: " + cap.getActiveSkill());
+                System.out.println("Player respawned with class: " + cap.getPlayerClass() + ", level: " + cap.getLevel() + ", exp: " + cap.getExperience() + ", points: " + cap.getSkillPoints() + ", active skill: " + cap.getActiveSkill());
                 cap.sync(player);
             });
         }
@@ -188,6 +159,22 @@ public class TestMod {
         }
     }
 
+    @SubscribeEvent
+    public void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+            event.accept(TestModItems.STRAWBERRY);
+            event.accept(TestModItems.STRAWBERRY_SEEDS);
+            event.accept(TestModItems.PEPPER_SPRAY);
+            event.accept(TestModItems.TRAP_PLACER);
+            event.accept(TestModItems.FOOD_BAG);
+            event.accept(TestModBlocks.TRAP_BLOCK);
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+    }
+
     public static class PlayerClassCapability implements INBTSerializable<CompoundTag> {
         public static final Capability<PlayerClassCapability> CAPABILITY = CapabilityManager.get(new CapabilityToken<>() {});
         private boolean hasTradeHandler = false;
@@ -197,7 +184,7 @@ public class TestMod {
         private int level = 1;
         private int experience = 0;
         private int skillPoints = 1;
-        private int surgeEnergy = 100;
+        private int surgeEnergy = 1000;
         private String activeSkill = "";
         private final Map<String, Integer> skillLevels = new HashMap<>();
 
@@ -231,7 +218,6 @@ public class TestMod {
 
         public void setSurgeEnergy(int surgeEnergy) {
             this.surgeEnergy = Math.max(0, Math.min(100, surgeEnergy));
-            LOGGER.info("Set surge energy to: " + this.surgeEnergy);
         }
 
         public void useSurgeEnergy(int amount) {
@@ -248,7 +234,6 @@ public class TestMod {
 
         public void setPlayerClass(String playerClass) {
             this.playerClass = playerClass != null ? playerClass : "";
-            LOGGER.info("Set player class to: " + this.playerClass + " (bytes: " + this.playerClass.getBytes(StandardCharsets.UTF_8).length + ")");
         }
 
         public int getLevel() {
@@ -313,7 +298,6 @@ public class TestMod {
 
         public void setActiveSkill(String skillId) {
             this.activeSkill = skillId != null ? skillId : "";
-            LOGGER.info("Set active skill to: " + this.activeSkill);
         }
 
         public void sync(ServerPlayer player) {
@@ -322,13 +306,11 @@ public class TestMod {
                     player.connection.connection,
                     NetworkDirection.PLAY_TO_CLIENT
             );
-            LOGGER.info("Syncing class to client: " + playerClass + ", level: " + level + ", exp: " + experience + ", points: " + skillPoints + ", surgeEnergy: " + surgeEnergy + ", active skill: " + activeSkill);
         }
 
         @Override
         public CompoundTag serializeNBT() {
             CompoundTag tag = new CompoundTag();
-            LOGGER.info("Serializing player class: " + playerClass + ", level: " + level + ", exp: " + experience + ", points: " + skillPoints + ", surgeEnergy: " + surgeEnergy + ", active skill: " + activeSkill);
             tag.putString("playerClass", playerClass);
             tag.putInt("level", level);
             tag.putInt("experience", experience);
@@ -352,7 +334,6 @@ public class TestMod {
             CompoundTag skillsTag = tag.getCompound("skills");
             skillLevels.clear();
             skillsTag.getAllKeys().forEach(key -> skillLevels.put(key, skillsTag.getInt(key)));
-            LOGGER.info("Deserialized player class: " + playerClass + ", level: " + level + ", exp: " + experience + ", points: " + skillPoints + ", surgeEnergy: " + surgeEnergy + ", active skill: " + activeSkill);
         }
 
         public static class Provider implements net.minecraftforge.common.capabilities.ICapabilitySerializable<CompoundTag> {
@@ -384,7 +365,6 @@ public class TestMod {
 
         @Override
         protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-            // Пустой фон, можно добавить текстуру
         }
 
         @Override
@@ -398,28 +378,28 @@ public class TestMod {
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Воин"),
                             button -> selectClass("war"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight - 30)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 30)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Повар"),
                             button -> selectClass("cook"))
-                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight - 10)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 - 10)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Курьер Yandex.Go"),
                             button -> selectClass("yandex.go"))
-                    .pos(centerX - buttonWidth / 2, centerY + 10)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 10)
                     .size(buttonWidth, buttonHeight)
                     .build());
 
             this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
                             Component.literal("Пивовар"),
                             button -> selectClass("pivo"))
-                    .pos(centerX - buttonWidth / 2, centerY + buttonHeight + 30)
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 30)
                     .size(buttonWidth, buttonHeight)
                     .build());
         }

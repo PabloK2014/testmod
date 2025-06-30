@@ -1,6 +1,7 @@
 package net.xach.testmod;
 
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -9,10 +10,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.monster.Vindicator;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.TickEvent;
@@ -24,15 +33,20 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
+import net.xach.testmod.entity.DagestanskiBrother;
+import net.xach.testmod.entity.DagestanskiRogue;
+import net.xach.testmod.entity.ModEntities;
 
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
-import java.util.logging.Logger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+
 
 @Mod.EventBusSubscriber(modid = TestMod.MOD_ID)
 public class WarSkillHandler {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
 
     // Уникальные идентификаторы для модификаторов атрибутов
     private static final UUID ATTACK_MODIFIER_UUID = UUID.fromString("c4d5e6f7-a8b9-4c0d-1e2f-3a4b5c6d7e8f");
@@ -41,42 +55,38 @@ public class WarSkillHandler {
     private static final UUID HEALTH_REGEN_MODIFIER_UUID = UUID.fromString("f7a8b9c0-d1e2-4f3a-5b6c-7d8e9f0a1b2c");
     private static final UUID CARRY_MODIFIER_UUID = UUID.fromString("a8b9c0d1-e2f3-4a5b-6c7d-8e9f0a1b2c3d");
 
-    // Регистрация команды для проверки навыков Воина
-    @SubscribeEvent
-    public static void onServerStarting(ServerStartingEvent event) {
-        var dispatcher = event.getServer().getCommands().getDispatcher();
-        dispatcher.register(
-                Commands.literal("war")
-                        .then(Commands.literal("skills")
-                                .executes(context -> executeSkillInfoCommand(context)))
-        );
-    }
+    // Добавить Map для отслеживания перезарядок
+    private static final Map<UUID, Long> lastChanceCooldowns = new HashMap<>();
+    // Добавить Map для отслеживания времени стояния
+    private static final Map<UUID, Integer> fortressStandingTime = new HashMap<>();
+    // Map для отслеживания призванных мобов с их временем жизни
+    private static final Map<Entity, Integer> summonedMobsLifetime = new HashMap<>();
 
-    private static int executeSkillInfoCommand(CommandContext<CommandSourceStack> context) {
-        if (context.getSource().getEntity() instanceof ServerPlayer player) {
-            player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
-                if (cap.getPlayerClass().equals("war")) {
-                    StringBuilder skillsInfo = new StringBuilder("Навыки Воина:\n");
-                    SkillTreeHandler.CLASS_SKILL_TREES.get("war").getAllSkills().forEach(skill -> {
-                        int level = cap.getSkillLevel(skill.getId());
-                        if (level > 0) {
-                            skillsInfo.append(skill.getName()).append(": Уровень ").append(level).append("\n");
-                        }
-                    });
-                    player.sendSystemMessage(Component.literal(skillsInfo.toString()));
-                } else {
-                    player.sendSystemMessage(Component.literal("Вы не Воин!"));
-                }
-            });
-        }
-        return 1;
-    }
-
-    // Обработка нажатия клавиши активации навыка
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && ModKeyBindings.ACTIVATE_SKILL.consumeClick()) {
-            TestMod.NETWORK.send(PacketDistributor.SERVER.noArg(), new SkillActivationPacket());
+        if (event.phase == TickEvent.Phase.END) {
+            if (ModKeyBindings.ACTIVATE_SKILL.consumeClick()) {
+                TestMod.NETWORK.send(PacketDistributor.SERVER.noArg(), new SkillActivationPacket());
+            }
+            if (ModKeyBindings.OPEN_ACTIVE_SKILL_MENU.consumeClick()) {
+                Minecraft minecraft = Minecraft.getInstance();
+                if (minecraft.player != null) {
+                    minecraft.player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
+                        // Проверяем, есть ли у игрока активные или глобальные навыки
+                        List<SkillTreeHandler.Skill> availableSkills = SkillTreeHandler.CLASS_SKILL_TREES.getOrDefault(cap.getPlayerClass(), null)
+                                .getAllSkills().stream()
+                                .filter(skill -> (skill.getType() == SkillTreeHandler.SkillType.ACTIVE || skill.getType() == SkillTreeHandler.SkillType.GLOBAL) && cap.getSkillLevel(skill.getId()) > 0)
+                                .toList();
+                        if (!availableSkills.isEmpty()) {
+                            minecraft.setScreen(new ActiveSkillSelectionScreen(
+                                    new ActiveSkillSelectionMenu(0, minecraft.player.getInventory()),
+                                    minecraft.player.getInventory(),
+                                    Component.literal("Выбор активного навыка")
+                            ));
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -105,13 +115,26 @@ public class WarSkillHandler {
             }
 
             int fortressLevel = cap.getSkillLevel("fortress");
-            if (fortressLevel > 0 && player.tickCount % 20 == 0) { // Проверяем каждую секунду
-                if (player.getDeltaMovement().x == 0 && player.getDeltaMovement().z == 0) {
-                    applyFortress(player);
+            if (fortressLevel > 0) {
+                UUID playerId = player.getUUID();
+                boolean isStanding = Math.abs(player.getDeltaMovement().x) < 0.01 &&
+                        Math.abs(player.getDeltaMovement().z) < 0.01;
+
+                if (isStanding) {
+                    int standingTime = fortressStandingTime.getOrDefault(playerId, 0) + 1;
+                    fortressStandingTime.put(playerId, standingTime);
+
+                    // Активируем эффект после 3 секунд стояния (60 тиков)
+                    if (standingTime >= 60) {
+                        applyFortress(player);
+                    }
+                } else {
+                    fortressStandingTime.put(playerId, 0);
+                    // Убираем эффекты при движении
+                    removeFortressEffects(player);
                 }
             }
 
-            // Ветка Таджика
             int tadjicLevel = cap.getSkillLevel("tadjic");
             if (tadjicLevel > 0) {
                 applyTadjicRegen(player, tadjicLevel);
@@ -122,6 +145,28 @@ public class WarSkillHandler {
                 applyCarryDamage(player, carryLevel);
             }
         });
+    }
+
+    // Тик для управления призванными мобами
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+
+        // Обновляем время жизни призванных мобов
+        Iterator<Map.Entry<Entity, Integer>> iterator = summonedMobsLifetime.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Entity, Integer> entry = iterator.next();
+            Entity mob = entry.getKey();
+            int lifetime = entry.getValue() + 1;
+
+            if (lifetime >= 900) { // 45 секунд (20 тиков * 45)
+                System.out.println("Removing summoned mob after 45 seconds: " + mob.getClass().getSimpleName());
+                mob.discard(); // Удаляем моба
+                iterator.remove(); // Удаляем из Map
+            } else {
+                entry.setValue(lifetime);
+            }
+        }
     }
 
     // Путь Берсерка: Увеличение урона и скорости атаки при низком здоровье
@@ -143,7 +188,6 @@ public class WarSkillHandler {
         player.getAttribute(Attributes.ATTACK_SPEED).removeModifier(ATTACK_SPEED_MODIFIER_UUID);
         player.getAttribute(Attributes.ATTACK_DAMAGE).addPermanentModifier(attackModifier);
         player.getAttribute(Attributes.ATTACK_SPEED).addPermanentModifier(speedModifier);
-        LOGGER.info("Applied Berserk Way for player: " + player.getName().getString() + ", level: " + level);
     }
 
     // Кровавая Рана: Шанс нанести кровотечение при атаке
@@ -162,7 +206,6 @@ public class WarSkillHandler {
                                 false,
                                 true
                         ));
-                        LOGGER.info("Applied Bloody Wound to " + target.getName().getString() + " by player: " + player.getName().getString());
                     }
                 }
             });
@@ -181,7 +224,6 @@ public class WarSkillHandler {
             player.hurtMarked = true; // Обновляем движение
             cap.useSurgeEnergy(20);
             cap.sync((ServerPlayer) player);
-            LOGGER.info("Activated Mad Boost for player: " + player.getName().getString());
         }
     }
 
@@ -193,7 +235,6 @@ public class WarSkillHandler {
                 if (cap.getPlayerClass().equals("war") && cap.getSkillLevel("thirst_battle") > 0) {
                     player.heal(player.getMaxHealth() * 0.1f); // Восстанавливает 10% здоровья
                     cap.sync((ServerPlayer) player);
-                    LOGGER.info("Thirst Battle healed player: " + player.getName().getString());
                 }
             });
         }
@@ -206,17 +247,24 @@ public class WarSkillHandler {
             player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
                 if (cap.getPlayerClass().equals("war") && cap.getSkillLevel("last_chance") > 0) {
                     if (player.getHealth() - event.getAmount() <= 0) {
-                        player.setHealth(1.0f); // Оставить 1 HP
-                        player.addEffect(new MobEffectInstance(
-                                MobEffects.DAMAGE_RESISTANCE,
-                                60, // 3 секунды неуязвимости
-                                5, // Высокий уровень сопротивления
-                                false,
-                                true
-                        ));
-                        event.setCanceled(true); // Отменяем смертельный урон
-                        cap.sync((ServerPlayer) player);
-                        LOGGER.info("Last Chance triggered for player: " + player.getName().getString());
+                        // Проверяем перезарядку (2 минуты = 120000 мс)
+                        long currentTime = System.currentTimeMillis();
+                        Long lastUse = lastChanceCooldowns.get(player.getUUID());
+
+                        if (lastUse == null || currentTime - lastUse >= 120000) {
+                            player.setHealth(1.0f); // Оставить 1 HP
+                            player.addEffect(new MobEffectInstance(
+                                    MobEffects.DAMAGE_RESISTANCE,
+                                    60, // 3 секунды неуязвимости
+                                    5, // Высокий уровень сопротивления
+                                    false,
+                                    true
+                            ));
+                            event.setCanceled(true); // Отменяем смертельный урон
+                            lastChanceCooldowns.put(player.getUUID(), currentTime);
+                            player.sendSystemMessage(Component.literal("Последний шанс активирован!"));
+                            cap.sync((ServerPlayer) player);
+                        }
                     }
                 }
             });
@@ -233,7 +281,6 @@ public class WarSkillHandler {
         );
         player.getAttribute(Attributes.ARMOR).removeModifier(DEFENSE_MODIFIER_UUID);
         player.getAttribute(Attributes.ARMOR).addPermanentModifier(defenseModifier);
-        LOGGER.info("Applied Iron Wall for player: " + player.getName().getString() + ", level: " + level);
     }
 
     // Несокрушимость: Сопротивление урону при низком здоровье
@@ -248,7 +295,6 @@ public class WarSkillHandler {
             ));
             cap.useSurgeEnergy(20);
             cap.sync((ServerPlayer) player);
-            LOGGER.info("Activated Indestructibility for player: " + player.getName().getString());
         }
     }
 
@@ -269,14 +315,20 @@ public class WarSkillHandler {
                         AttributeModifier.Operation.ADDITION
                 )
         );
-        LOGGER.info("Applied Fortress for player: " + player.getName().getString());
+    }
+
+    // Добавить метод для удаления эффектов крепости:
+    private static void removeFortressEffects(Player player) {
+        // Убираем модификатор сопротивления отбрасыванию
+        player.getAttribute(Attributes.KNOCKBACK_RESISTANCE).removeModifier(
+                UUID.fromString("12345678-1234-5678-9abc-123456789abc")
+        );
     }
 
     // Монобровь: Увеличение регенерации здоровья
     private static void applyTadjicRegen(Player player, int level) {
         if (player.tickCount % 20 == 0) { // Каждую секунду
             player.heal(0.02f * level * player.getMaxHealth()); // +2% регенерации за уровень
-            LOGGER.info("Applied Tadjic Regen for player: " + player.getName().getString() + ", level: " + level);
         }
     }
 
@@ -290,26 +342,135 @@ public class WarSkillHandler {
         );
         player.getAttribute(Attributes.ATTACK_DAMAGE).removeModifier(CARRY_MODIFIER_UUID);
         player.getAttribute(Attributes.ATTACK_DAMAGE).addPermanentModifier(carryModifier);
-        LOGGER.info("Applied Carry Damage for player: " + player.getName().getString() + ", level: " + level);
     }
 
-    // Дагестанская братва: Призыв союзников
+    // Дагестанская братва: Призыв союзников (ИСПРАВЛЕННАЯ ВЕРСИЯ)
     public static void activateDagestan(Player player, TestMod.PlayerClassCapability cap) {
+        System.out.println("Dagestan skill activation started for player: " + player.getName().getString());
+
         if (cap.getSkillLevel("dagestan") > 0 && cap.getSurgeEnergy() >= 50) {
             Level level = player.level();
-            for (int i = 0; i < 3; i++) { // Призываем 3 союзников
-                // Создаем имитацию союзника (например, волка, как заглушку)
-                net.minecraft.world.entity.animal.Wolf wolf = new net.minecraft.world.entity.animal.Wolf(
-                        net.minecraft.world.entity.EntityType.WOLF, level
-                );
-                wolf.setPos(player.getX() + new Random().nextInt(3) - 1, player.getY(), player.getZ() + new Random().nextInt(3) - 1);
-                wolf.setOwnerUUID(player.getUUID());
-                wolf.setTame(true);
-                level.addFreshEntity(wolf);
+            System.out.println("Skill level: " + cap.getSkillLevel("dagestan") + ", Energy: " + cap.getSurgeEnergy());
+
+            // Призываем 3 разбойников с правильным ИИ и оружием
+            for (int i = 0; i < 3; i++) {
+                try {
+                    System.out.println("Creating pillager " + (i + 1));
+                    Pillager pillager = new Pillager(EntityType.PILLAGER, level);
+
+                    // Размещаем разбойников вокруг игрока
+                    double angle = (2 * Math.PI * i) / 3;
+                    double x = player.getX() + Math.cos(angle) * 2;
+                    double z = player.getZ() + Math.sin(angle) * 2;
+
+                    pillager.setPos(x, player.getY(), z);
+
+                    // ВАЖНО: Даем арбалет разбойнику
+                    ItemStack crossbow = new ItemStack(Items.CROSSBOW);
+                    pillager.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, crossbow);
+
+                    // Полностью очищаем все цели атаки
+                    pillager.goalSelector.removeAllGoals(goal -> true);
+                    pillager.targetSelector.removeAllGoals(goal -> true);
+
+                    // Добавляем только базовые цели поведения (без атаки игроков)
+                    pillager.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(pillager));
+                    pillager.goalSelector.addGoal(2, new net.minecraft.world.entity.ai.goal.RangedCrossbowAttackGoal<>(pillager, 1.0D, 8.0F));
+                    pillager.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(pillager, 0.6D));
+                    pillager.goalSelector.addGoal(9, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(pillager, Player.class, 15.0F, 1.0F));
+                    pillager.goalSelector.addGoal(10, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(pillager, LivingEntity.class, 15.0F));
+
+                    // Добавляем цель атаковать ТОЛЬКО монстров (исключая других союзников)
+                    pillager.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(pillager, Monster.class, true,
+                            (target) -> !(target instanceof Pillager) && !(target instanceof Vindicator)));
+
+                    // Убираем текущую цель
+                    pillager.setTarget(null);
+
+                    // Добавляем эффекты
+                    pillager.addEffect(new MobEffectInstance(MobEffects.GLOWING, 900, 0)); // Подсветка на 45 сек
+                    pillager.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 900, 1)); // Усиление урона
+                    pillager.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 900, 0)); // Ускорение
+
+                    boolean spawned = level.addFreshEntity(pillager);
+                    if (spawned) {
+                        summonedMobsLifetime.put(pillager, 0);
+                        System.out.println("Added pillager to lifetime tracking");
+                    }
+                    System.out.println("Pillager " + (i + 1) + " spawned: " + spawned + " at " + x + ", " + player.getY() + ", " + z);
+                } catch (Exception e) {
+                    System.err.println("Error creating pillager " + (i + 1) + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
+
+            // Призываем 2 поборников с правильным ИИ
+            for (int i = 0; i < 2; i++) {
+                try {
+                    System.out.println("Creating vindicator " + (i + 1));
+                    Vindicator vindicator = new Vindicator(EntityType.VINDICATOR, level);
+
+                    // Размещаем поборников рядом с игроком
+                    double angle = Math.PI * i; // 0 и 180 градусов
+                    double x = player.getX() + Math.cos(angle) * 3;
+                    double z = player.getZ() + Math.sin(angle) * 3;
+
+                    vindicator.setPos(x, player.getY(), z);
+
+                    // Даем топор поборнику
+                    ItemStack axe = new ItemStack(Items.IRON_AXE);
+                    vindicator.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, axe);
+
+                    // Полностью очищаем все цели атаки
+                    vindicator.goalSelector.removeAllGoals(goal -> true);
+                    vindicator.targetSelector.removeAllGoals(goal -> true);
+
+                    // Добавляем только базовые цели поведения
+                    vindicator.goalSelector.addGoal(0, new net.minecraft.world.entity.ai.goal.FloatGoal(vindicator));
+                    vindicator.goalSelector.addGoal(4, new net.minecraft.world.entity.ai.goal.MeleeAttackGoal(vindicator, 1.0D, false));
+                    vindicator.goalSelector.addGoal(8, new net.minecraft.world.entity.ai.goal.RandomStrollGoal(vindicator, 0.6D));
+                    vindicator.goalSelector.addGoal(9, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(vindicator, Player.class, 3.0F, 1.0F));
+                    vindicator.goalSelector.addGoal(10, new net.minecraft.world.entity.ai.goal.LookAtPlayerGoal(vindicator, LivingEntity.class, 8.0F));
+
+                    // Добавляем цель атаковать ТОЛЬКО монстров
+                    vindicator.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(vindicator, Monster.class, true,
+                            (target) -> !(target instanceof Vindicator) && !(target instanceof Pillager)));
+
+                    // Убираем текущую цель
+                    vindicator.setTarget(null);
+
+                    // Добавляем эффекты
+                    vindicator.addEffect(new MobEffectInstance(MobEffects.GLOWING, 900, 0)); // Подсветка на 45 сек
+                    vindicator.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 900, 2)); // Сильное усиление урона
+                    vindicator.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 900, 1)); // Ускорение
+
+                    boolean spawned = level.addFreshEntity(vindicator);
+                    if (spawned) {
+                        summonedMobsLifetime.put(vindicator, 0);
+                        System.out.println("Added vindicator to lifetime tracking");
+                    }
+                    System.out.println("Vindicator " + (i + 1) + " spawned: " + spawned + " at " + x + ", " + player.getY() + ", " + z);
+                } catch (Exception e) {
+                    System.err.println("Error creating vindicator " + (i + 1) + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+            // Тратим энергию и отправляем сообщение
             cap.useSurgeEnergy(50);
             cap.sync((ServerPlayer) player);
-            LOGGER.info("Activated Dagestan (summoned allies) for player: " + player.getName().getString());
+            player.sendSystemMessage(Component.literal("Дагестанская братва призвана! 3 разбойника и 2 поборника готовы к бою!"));
+
+            System.out.println("Dagestan skill completed. Total summoned mobs in tracking: " + summonedMobsLifetime.size());
+        } else {
+            // Сообщение об ошибке
+            if (cap.getSkillLevel("dagestan") == 0) {
+                player.sendSystemMessage(Component.literal("У вас нет навыка 'Дагестанская братва'!"));
+                System.out.println("Player " + player.getName().getString() + " doesn't have dagestan skill");
+            } else if (cap.getSurgeEnergy() < 50) {
+                player.sendSystemMessage(Component.literal("Недостаточно энергии! Требуется: 50, у вас: " + cap.getSurgeEnergy()));
+                System.out.println("Player " + player.getName().getString() + " doesn't have enough energy: " + cap.getSurgeEnergy());
+            }
         }
     }
 }

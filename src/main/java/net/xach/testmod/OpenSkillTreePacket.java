@@ -10,28 +10,28 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkHooks;
 
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+
 
 public class OpenSkillTreePacket {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
+
 
     public OpenSkillTreePacket() {
-        LOGGER.info("Created OpenSkillTreePacket");
+
     }
 
     public OpenSkillTreePacket(FriendlyByteBuf buf) {
-        LOGGER.info("Decoded OpenSkillTreePacket");
+
     }
 
     public void toBytes(FriendlyByteBuf buf) {
-        LOGGER.info("Encoded OpenSkillTreePacket");
+
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                LOGGER.info("Opening skill tree for player: " + player.getName().getString());
+
                 NetworkHooks.openScreen(player, new MenuProvider() {
                     @Override
                     public Component getDisplayName() {

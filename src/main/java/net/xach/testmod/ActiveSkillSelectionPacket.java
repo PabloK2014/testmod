@@ -6,10 +6,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+
 
 public class ActiveSkillSelectionPacket {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
+
     private final String skillId;
 
     public ActiveSkillSelectionPacket(String skillId) {
@@ -36,14 +36,14 @@ public class ActiveSkillSelectionPacket {
                     if (isValidSkill) {
                         cap.setActiveSkill(skillId);
                         cap.sync(player);
-                        LOGGER.info("Set active skill to " + skillId + " for player: " + player.getName().getString());
+
                     } else {
-                        LOGGER.warning("Invalid active skill selected: " + skillId + " for class: " + cap.getPlayerClass());
+
                         player.sendSystemMessage(Component.literal("Недопустимый навык: " + skillId));
                     }
                 });
             } else {
-                LOGGER.warning("No player found for active skill selection");
+
             }
         });
         ctx.get().setPacketHandled(true);

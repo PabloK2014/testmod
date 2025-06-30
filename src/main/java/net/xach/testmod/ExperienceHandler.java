@@ -16,7 +16,7 @@ public class ExperienceHandler {
             player.getCapability(TestMod.PlayerClassCapability.CAPABILITY).ifPresent(cap -> {
                 if (!cap.getPlayerClass().isEmpty()) {
                     cap.addExperience(10);
-                    cap.sync(player); // Синхронизация после начисления опыта
+                    cap.sync(player);
                 }
             });
         }

@@ -14,8 +14,7 @@ public class ModTreeGrowers extends AbstractTreeGrower {
     @Nullable
     @Override
     protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource pRandom, boolean pHasFlowers) {
-        TestMod.LOGGER.info("Returning configured feature: MAGIC_TREE");
-        // Выводим сообщение в чат для всех игроков на сервере
+
         if (pRandom instanceof ServerLevel serverLevel) {
             for (Player player : serverLevel.players()) {
                 player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Returning configured feature: MAGIC_TREE"));

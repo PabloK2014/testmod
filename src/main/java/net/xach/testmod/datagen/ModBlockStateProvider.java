@@ -39,8 +39,39 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         blockWithItem(TestModBlocks.MAGIC_PLANKS);
 
+        // Регистрируем модели для блоков
+        stairsBlock(TestModBlocks.MAGIC_STAIRS.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+        slabBlock(TestModBlocks.MAGIC_SLAB.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+        pressurePlateBlock(TestModBlocks.MAGIC_PRESSURE_PLATE.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+        buttonBlock(TestModBlocks.MAGIC_BUTTON.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+        fenceBlock(TestModBlocks.MAGIC_FENCE.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+        fenceGateBlock(TestModBlocks.MAGIC_FENCE_GATE.get(), blockTexture(TestModBlocks.MAGIC_PLANKS.get()));
+
+        // Кастомные текстуры для двери и люка
+        ResourceLocation doorBottom = modLoc("block/magic_door_bottom");
+        ResourceLocation doorTop = modLoc("block/magic_door_top");
+        ResourceLocation trapdoorTexture = modLoc("block/magic_trapdoor");
+
+        // Дверь с кастомными текстурами
+        doorBlockWithRenderType(TestModBlocks.MAGIC_DOOR.get(), doorBottom, doorTop, "cutout");
+
+        // Люк с кастомной текстурой
+        trapdoorBlockWithRenderType(TestModBlocks.MAGIC_TRAPDOOR.get(), trapdoorTexture, true, "cutout");
+
+        // Регистрируем айтемы для блоков
+        blockItem(TestModBlocks.MAGIC_STAIRS);
+        blockItem(TestModBlocks.MAGIC_SLAB);
+        blockItem(TestModBlocks.MAGIC_PRESSURE_PLATE);
+        blockItem(TestModBlocks.MAGIC_FENCE_GATE);
+
+        // Кнопка, забор, дверь и люк регистрируются в ModItemModelProvider
+
         leavesBlock(TestModBlocks.MAGIC_LEAVES);
         saplingBlock(TestModBlocks.MAGIC_SAPLING);
+
+        // Ловушка - используем текстуру trap_placer для отладки
+        simpleBlockWithItem(TestModBlocks.TRAP_BLOCK.get(),
+                models().cubeAll("trap_block", modLoc("item/trap_placer")));
     }
 
 

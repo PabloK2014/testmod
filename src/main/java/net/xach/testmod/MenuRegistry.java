@@ -20,6 +20,9 @@ public class MenuRegistry {
     public static final RegistryObject<MenuType<ActiveSkillSelectionMenu>> ACTIVE_SKILL_SELECTION = MENUS.register("active_skill_selection",
             () -> IForgeMenuType.create((id, inv, data) -> new ActiveSkillSelectionMenu(id, inv)));
 
+    public static final RegistryObject<MenuType<FoodBagMenu>> FOOD_BAG = MENUS.register("food_bag",
+            () -> IForgeMenuType.create(FoodBagMenu::new));
+
     public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);
     }

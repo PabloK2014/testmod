@@ -24,12 +24,23 @@ public class CreativeTabTestMod extends CreativeModeTab {
                     .displayItems((pParameters, output) -> {
                         output.accept(TestModItems.STRAWBERRY.get());
                         output.accept(TestModItems.STRAWBERRY_SEEDS.get());
+                        output.accept(TestModItems.FOOD_BAG.get());
                         output.accept(TestModBlocks.MAGIC_LOG.get());
                         output.accept(TestModBlocks.MAGIC_LEAVES.get());
                         output.accept(TestModBlocks.MAGIC_PLANKS.get());
                         output.accept(TestModBlocks.MAGIC_WOOD.get());
-                        output.accept(TestModItems.MAGIC_SAPLING.get());
+                        output.accept(TestModBlocks.MAGIC_SAPLING.get());
                         output.accept(TestModItems.STRAWBERRY.get());
+                        output.accept(TestModBlocks.MAGIC_STAIRS.get());
+                        output.accept(TestModBlocks.MAGIC_SLAB.get());
+                        output.accept(TestModBlocks.MAGIC_PRESSURE_PLATE.get());
+                        output.accept(TestModBlocks.MAGIC_BUTTON.get());
+                        output.accept(TestModBlocks.MAGIC_FENCE.get());
+                        output.accept(TestModBlocks.MAGIC_FENCE_GATE.get());
+                        output.accept(TestModBlocks.MAGIC_TRAPDOOR.get());
+                        output.accept(TestModBlocks.MAGIC_DOOR.get());
+                        output.accept(TestModBlocks.TRAP_BLOCK.get());
+                        output.accept(TestModItems.PEPPER_SPRAY.get());
                     })
                     .build());
 }

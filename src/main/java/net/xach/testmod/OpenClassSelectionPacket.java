@@ -11,10 +11,10 @@ import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+
 
 public class OpenClassSelectionPacket {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
+
 
     public OpenClassSelectionPacket() {}
 
@@ -26,7 +26,7 @@ public class OpenClassSelectionPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                LOGGER.info("Opening ClassSelectionMenu for player: " + player.getName().getString());
+
                 NetworkHooks.openScreen(player, new MenuProvider() {
                     @Override
                     public Component getDisplayName() {
@@ -39,7 +39,7 @@ public class OpenClassSelectionPacket {
                     }
                 });
             } else {
-                LOGGER.warning("No player found for OpenClassSelectionPacket");
+
             }
         });
         ctx.get().setPacketHandled(true);

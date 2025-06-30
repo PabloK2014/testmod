@@ -12,11 +12,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 @OnlyIn(Dist.CLIENT)
 public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(TestMod.MOD_ID, "textures/gui/custom_skill_tree.png");
     private static final ResourceLocation TABS_TEXTURE = new ResourceLocation("minecraft", "textures/gui/advancements/tabs.png");
     private final List<SkillTab> tabs = new ArrayList<>();
@@ -30,7 +29,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
         super(menu, inventory, title);
         this.imageWidth = 256;
         this.imageHeight = 256;
-        LOGGER.info("Инициализация SkillTreeScreen с размером " + this.imageWidth + "x" + this.imageHeight);
     }
 
     @Override
@@ -63,9 +61,7 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                     selectedTab = tabs.get(Math.min(previousTabIndex, tabs.size() - 1));
                     updateBounds();
                     updateTabButtons();
-                    LOGGER.info("Инициализировано " + tabs.size() + " вкладок для класса: " + playerClass + ", выбрана вкладка: " + selectedTab.title.getString());
-                } else {
-                    LOGGER.warning("Древо навыков не найдено для класса: " + playerClass);
+
                 }
             });
         }
@@ -84,7 +80,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 maxY = Math.max(maxY, node.y + 20);
             }
         }
-        LOGGER.info("Обновлены границы: minX=" + minX + ", maxX=" + maxX + ", minY=" + minY + ", maxY=" + maxY);
     }
 
     @Override
@@ -94,9 +89,7 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
             int x = (this.width - this.imageWidth) / 2;
             int y = (this.height - this.imageHeight) / 2;
             guiGraphics.blit(BACKGROUND_TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
-            LOGGER.info("Отрисован фон на " + x + "," + y);
         } catch (Exception e) {
-            LOGGER.warning("Ошибка при отрисовке фона: " + e.getMessage());
         }
 
         if (selectedTab != null) {
@@ -110,7 +103,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                     int endX = offsetX + node.x + 10;
                     int endY = offsetY + node.y + 10;
                     guiGraphics.fill(startX, startY, endX, endY, 0xFF00FF00);
-                    LOGGER.info("Отрисована линия от " + startX + "," + startY + " до " + endX + "," + endY);
                 }
             }
         }
@@ -138,7 +130,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 case "Грузоподъёмность" -> "Gruzopodyomnost";
                 default -> tab.title.getString();
             };
-            LOGGER.info("Отрисована вкладка " + tabTitle + " на " + tabX + "," + tabY);
         }
 
         if (selectedTab != null) {
@@ -163,7 +154,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 guiGraphics.drawString(this.font, "Опыт: " + cap.getExperience() + "/" + (cap.getLevel() * 100), textX, textY + 10, 0xFFFFFF);
                 guiGraphics.drawString(this.font, "Очки навыков: " + cap.getSkillPoints(), textX, textY + 20, 0xFFFFFF);
                 guiGraphics.drawString(this.font, "Энергия: " + cap.getSurgeEnergy() + "/100", textX, textY + 30, 0xFFFFFF);
-                LOGGER.info("Отрисована информация об игроке на " + textX + "," + textY);
             });
         }
 
@@ -171,7 +161,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
             for (SkillNode node : selectedTab.nodes) {
                 if (node.button.isMouseOver(mouseX, mouseY)) {
                     guiGraphics.renderTooltip(font, Component.literal(node.skill.getDescription()), mouseX, mouseY);
-                    LOGGER.info("Отрисована подсказка для навыка: " + node.skill.getId());
                 }
             }
         }
@@ -181,7 +170,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int offsetX = (this.width - imageWidth) / 2;
         int offsetY = (this.height - imageHeight) / 2 + 30;
-        LOGGER.info("Клик мыши: mouseX=" + mouseX + ", mouseY=" + mouseY + ", button=" + button);
 
         // Проверка клика по вкладкам
         int baseTabX = (this.width - this.imageWidth) / 2;
@@ -198,7 +186,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                     case "Грузоподъёмность" -> "Gruzopodyomnost";
                     default -> tabs.get(i).title.getString();
                 };
-                LOGGER.info("Выбрана вкладка: " + tabTitle);
                 return true;
             }
         }
@@ -213,7 +200,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 int textY = offsetY + node.y + 6;
                 if (mouseX >= textX && mouseX < textX + this.font.width(node.skillText) &&
                         mouseY >= textY && mouseY < textY + this.font.lineHeight) {
-                    LOGGER.info("Клик по тексту навыка: " + node.skill.getId());
                     return true;
                 }
             }
@@ -223,14 +209,12 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
         if (selectedTab != null) {
             for (SkillNode node : selectedTab.nodes) {
                 if (node.button.isMouseOver(mouseX, mouseY)) {
-                    LOGGER.info("Клик по кнопке навыка: " + node.skill.getId());
                     node.button.mouseClicked(mouseX, mouseY, button);
                     return true;
                 }
             }
         }
 
-        LOGGER.info("Клик вне интерактивных элементов: mouseX=" + mouseX + ", mouseY=" + mouseY);
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
@@ -248,7 +232,7 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 node.button.setX(offsetX + node.x);
                 node.button.setY(offsetY + node.y);
                 this.addRenderableWidget(node.button);
-                LOGGER.info("Добавлена кнопка для навыка: " + node.skill.getId() + " на " + node.button.getX() + "," + node.button.getY());
+
             }
         }
     }
@@ -289,7 +273,6 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                 nodes.add(new SkillNode(skill, button, skillText, baseX, y, parent));
                 addRenderableWidget(button);
                 currentY += 30;
-                LOGGER.info("Добавлен узел навыка: " + skill.getId() + " на " + baseX + "," + y + ", заблокирован: " + isLocked);
             }
         }
     }
@@ -314,11 +297,9 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
 
     private void upgradeSkill(String skillId) {
         if (minecraft != null && minecraft.player != null) {
-            LOGGER.info("Отправка пакета прокачки навыка: " + skillId);
             TestMod.NETWORK.sendToServer(new SkillUpgradePacket(skillId));
             init();
             updateTabButtons();
-            LOGGER.info("Переинициализация экрана после прокачки навыка: " + skillId);
         }
     }
 }

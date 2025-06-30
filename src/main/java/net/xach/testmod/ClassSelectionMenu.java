@@ -12,11 +12,11 @@ public class ClassSelectionMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return true; // Указывает, что меню остаётся доступным для игрока
+        return true;
     }
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY; // Возвращаем пустой стек, так как перемещение предметов не требуется
+        return ItemStack.EMPTY;
     }
 }

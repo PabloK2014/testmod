@@ -1,20 +1,20 @@
 package net.xach.testmod;
 
-import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
 
 @OnlyIn(Dist.CLIENT)
 public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSkillSelectionMenu> {
-    private static final Logger LOGGER = Logger.getLogger(TestMod.MOD_ID);
 
     public ActiveSkillSelectionScreen(ActiveSkillSelectionMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -82,7 +82,6 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
                 cap.setActiveSkill(skillId);
                 TestMod.NETWORK.sendToServer(new ActiveSkillSelectionPacket(skillId));
                 minecraft.setScreen(null);
-                LOGGER.info("Selected active skill: " + skillId);
             });
         }
     }
@@ -97,5 +96,31 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
     @Override
     public boolean isPauseScreen() {
         return true;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static class FoodBagScreen extends AbstractContainerScreen<FoodBagMenu> {
+        private static final ResourceLocation TEXTURE = new ResourceLocation("minecraft", "textures/gui/container/generic_54.png");
+
+        public FoodBagScreen(FoodBagMenu menu, Inventory playerInventory, Component title) {
+            super(menu, playerInventory, title);
+            this.imageHeight = 168;
+            this.inventoryLabelY = this.imageHeight - 94;
+        }
+
+        @Override
+        protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            int x = (this.width - this.imageWidth) / 2;
+            int y = (this.height - this.imageHeight) / 2;
+            guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            this.renderBackground(guiGraphics);
+            super.render(guiGraphics, mouseX, mouseY, partialTick);
+            this.renderTooltip(guiGraphics, mouseX, mouseY);
+        }
     }
 }
