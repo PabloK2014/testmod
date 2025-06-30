@@ -59,6 +59,10 @@ public class SkillTreeScreen extends AbstractContainerScreen<SkillTreeMenu> {
                         tabs.add(new SkillTab(0, Component.literal("Добыча"), skillTree.getBranches().get(0), cap));
                         tabs.add(new SkillTab(1, Component.literal("Исследование"), skillTree.getBranches().get(1), cap));
                         tabs.add(new SkillTab(2, Component.literal("Выживание"), skillTree.getBranches().get(2), cap));
+                    } else if (playerClass.equals("smith")) {
+                        tabs.add(new SkillTab(0, Component.literal("Крафт"), skillTree.getBranches().get(0), cap));
+                        tabs.add(new SkillTab(1, Component.literal("Ремонт"), skillTree.getBranches().get(1), cap));
+                        tabs.add(new SkillTab(2, Component.literal("Огненное мастерство"), skillTree.getBranches().get(2), cap));
                     }
                     selectedTab = tabs.get(Math.min(previousTabIndex, tabs.size() - 1));
                     updateBounds();

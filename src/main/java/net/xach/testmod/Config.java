@@ -55,7 +55,6 @@ public class Config {
         ));
         // Повар: Замедление I, Насыщение I
         classEffects.put("cook", List.of(
-                new EffectConfig(MobEffects.MOVEMENT_SLOWDOWN, 1, 200),
                 new EffectConfig(MobEffects.SATURATION, 1, 200)
         ));
         // Курьер Yandex.Go: Скорость I

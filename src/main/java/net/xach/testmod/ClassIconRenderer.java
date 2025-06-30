@@ -263,6 +263,8 @@ public class ClassIconRenderer {
             case "cook" -> "textures/gui/chef.png";
             case "yandex.go" -> "textures/gui/yandex.png";
             case "pivo" -> "textures/gui/brewer.png";
+            case "smith" -> "textures/gui/smith.png";
+            case "miner" -> "textures/gui/miner.png";
             default -> "textures/gui/unknown.png";
         };
         ResourceLocation texture = new ResourceLocation(TestMod.MOD_ID, texturePath);

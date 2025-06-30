@@ -87,6 +87,54 @@ public class SkillActivationPacket {
                                 player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
                         }
                     }
+                    // Обработка навыков для класса "pivo"
+                    else if (playerClass.equals("pivo")) {
+                        switch (activeSkill) {
+                            case "master_brewer":
+                                PivoSkillHandler.activateMasterBrewer(player, cap);
+                                break;
+                            case "bottle_throw":
+                                PivoSkillHandler.activateBottleThrow(player, cap);
+                                break;
+                            case "berserker_drink":
+                                PivoSkillHandler.activateBerserkerDrink(player, cap);
+                                break;
+                            case "healing_ale":
+                                PivoSkillHandler.activateHealingAle(player, cap);
+                                break;
+                            case "party_time":
+                                PivoSkillHandler.activatePartyTime(player, cap);
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
+                    }
+                    // Обработка навыков для класса "cook"
+                    else if (playerClass.equals("cook")) {
+                        switch (activeSkill) {
+                            case "smoke_screen":
+                                CookSkillHandler.activateSmokeScreen(player, cap);
+                                break;
+                            case "banquet":
+                                CookSkillHandler.activateBanquet(player, cap);
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
+                    }
+                    // Обработка навыков для класса "smith"
+                    else if (playerClass.equals("smith")) {
+                        switch (activeSkill) {
+                            case "instant_repair":
+                                SmithSkillHandler.activateInstantRepair(player, cap);
+                                break;
+                            case "hot_strike":
+                                SmithSkillHandler.activateHotStrike(player, cap);
+                                break;
+                            default:
+                                player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Неизвестный навык: " + activeSkill));
+                        }
+                    }
                     // Добавьте обработку для других классов по необходимости
                     else {
                         player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Активация навыков для класса " + playerClass + " пока не реализована."));

@@ -55,6 +55,7 @@ public class ClassCommand {
                     player.sendSystemMessage(Component.literal("- /testmod class yandex.go (Курьер Yandex.Go)"));
                     player.sendSystemMessage(Component.literal("- /testmod class pivo (Пивовар)"));
                     player.sendSystemMessage(Component.literal("- /testmod class miner (Шахтёр)"));
+                    player.sendSystemMessage(Component.literal("- /testmod class smith (Кузнец)"));
                 }
             });
         }
@@ -139,7 +140,8 @@ public class ClassCommand {
                 className.equals("cook") ||
                 className.equals("yandex.go") ||
                 className.equals("pivo") ||
-                className.equals("miner");
+                className.equals("miner") ||
+                className.equals("smith");
     }
 
     private static String getClassDisplayName(String className) {
@@ -149,6 +151,7 @@ public class ClassCommand {
             case "yandex.go" -> "Курьер Yandex.Go";
             case "pivo" -> "Пивовар";
             case "miner" -> "Шахтёр";
+            case "smith" -> "Кузнец";
             default -> className;
         };
     }

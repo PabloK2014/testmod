@@ -100,29 +100,95 @@ public class SkillTreeHandler {
         minerTree.addBranch(survivalBranch);
         CLASS_SKILL_TREES.put("miner", minerTree);
 
-        // Класс Повар
-        SkillTree cookTree = new SkillTree();
-
-        // Ветка "Гурман"
-        List<Skill> gourmetBranch = Arrays.asList(
-                new Skill("food_efficiency", "Эффективность еды", "Еда даёт больше сытости", SkillType.PASSIVE, 1, 5, null),
-                new Skill("cooking_speed", "Скорость готовки", "Быстрее готовит еду", SkillType.PASSIVE, 5, 3, "food_efficiency")
-        );
-
-        cookTree.addBranch(gourmetBranch);
-        CLASS_SKILL_TREES.put("cook", cookTree);
-
         // Класс Пивовар
         SkillTree pivoTree = new SkillTree();
 
         // Ветка "Мастер ферментации"
         List<Skill> fermentationBranch = Arrays.asList(
-                new Skill("brewing_efficiency", "Эффективность варки", "Быстрее варит зелья", SkillType.PASSIVE, 1, 5, null),
-                new Skill("potion_power", "Сила зелий", "Зелья действуют дольше", SkillType.PASSIVE, 5, 3, "brewing_efficiency")
+                new Skill("brewing_efficiency", "Эффективность варки", "Ускоряет варку зелий на 20% за уровень", SkillType.PASSIVE, 1, 5, null),
+                new Skill("potion_duration", "Длительность зелий", "Увеличивает время действия зелий на 25% за уровень", SkillType.PASSIVE, 5, 3, "brewing_efficiency"),
+                new Skill("double_brew", "Двойная варка", "15% шанс получить дополнительное зелье", SkillType.PASSIVE, 10, 3, "potion_duration"),
+                new Skill("master_brewer", "Мастер-пивовар", "Создаёт уникальные алкогольные напитки", SkillType.ACTIVE, 15, 1, "double_brew")
+        );
+
+        // Ветка "Пьяный мастер"
+        List<Skill> drunkMasterBranch = Arrays.asList(
+                new Skill("alcohol_resistance", "Устойчивость к алкоголю", "Сопротивление негативным эффектам", SkillType.PASSIVE, 1, 3, null),
+                new Skill("drunk_strength", "Пьяная сила", "Урон увеличивается при низком здоровье", SkillType.PASSIVE, 5, 5, "alcohol_resistance"),
+                new Skill("bottle_throw", "Метание бутылок", "Бросает взрывные бутылки", SkillType.ACTIVE, 10, 1, "drunk_strength"),
+                new Skill("berserker_drink", "Напиток берсерка", "Временная неуязвимость и ярость", SkillType.ACTIVE, 20, 1, "bottle_throw")
+        );
+
+        // Ветка "Вечеринка в таверне"
+        List<Skill> tavernPartyBranch = Arrays.asList(
+                new Skill("group_buff", "Групповой бафф", "Даёт эффекты ближайшим союзникам", SkillType.PASSIVE, 1, 3, null),
+                new Skill("healing_ale", "Лечебный эль", "Восстанавливает здоровье союзникам", SkillType.ACTIVE, 8, 1, "group_buff"),
+                new Skill("party_time", "Время вечеринки", "Массовые баффы для всей команды", SkillType.ACTIVE, 15, 1, "healing_ale")
         );
 
         pivoTree.addBranch(fermentationBranch);
+        pivoTree.addBranch(drunkMasterBranch);
+        pivoTree.addBranch(tavernPartyBranch);
         CLASS_SKILL_TREES.put("pivo", pivoTree);
+
+        // Класс Повар
+        SkillTree cookTree = new SkillTree();
+
+        // Ветка "Гурман"
+        List<Skill> gourmetBranch = Arrays.asList(
+                new Skill("fresh_product", "Свежий продукт", "Еда восстанавливает на 2% сытости больше за уровень", SkillType.PASSIVE, 1, 5, null),
+                new Skill("fast_cooking", "Быстрое приготовление", "Время готовки в печи уменьшено на 10% за уровень", SkillType.PASSIVE, 5, 3, "fresh_product"),
+                new Skill("hearty_meal", "Сытный обед", "Эффект сытости длится в 2 раза дольше", SkillType.PASSIVE, 10, 1, "fast_cooking"),
+                new Skill("chef_master", "Шеф-повар", "Приготовленная еда даёт случайные позитивные эффекты", SkillType.PASSIVE, 15, 1, "hearty_meal")
+        );
+
+        // Ветка "Огненная кухня"
+        List<Skill> fieryKitchenBranch = Arrays.asList(
+                new Skill("smoke_screen", "Дымовая завеса", "При ударе ниже 30% HP даёт невидимость на 3 сек", SkillType.ACTIVE, 1, 1, null),
+                new Skill("flambe", "Фламбе", "При убийстве подожжённого врага происходит взрыв", SkillType.PASSIVE, 8, 3, "smoke_screen"),
+                new Skill("fire_immunity", "Огнестойкость", "Иммунитет к огню и лаве", SkillType.PASSIVE, 15, 1, "flambe")
+        );
+
+        // Ветка "Ресторанный критик"
+        List<Skill> criticBranch = Arrays.asList(
+                new Skill("ready", "Готово!", "Приготовление еды даёт бафф 'Вдохновение' (+10% урона)", SkillType.PASSIVE, 1, 3, null),
+                new Skill("quick_snack", "Быстрый перекус", "Можно есть на бегу без замедления", SkillType.PASSIVE, 5, 1, "ready"),
+                new Skill("feast_world", "Пир на весь мир", "Разделение еды с союзниками лечит их на +2 сердца", SkillType.PASSIVE, 10, 1, "quick_snack"),
+                new Skill("banquet", "Банкет", "Все союзники получают регенерацию и сопротивление", SkillType.ACTIVE, 20, 1, "feast_world")
+        );
+
+        cookTree.addBranch(gourmetBranch);
+        cookTree.addBranch(fieryKitchenBranch);
+        cookTree.addBranch(criticBranch);
+        CLASS_SKILL_TREES.put("cook", cookTree);
+
+        // Класс Кузнец
+        SkillTree smithTree = new SkillTree();
+
+        // Ветка "Крафт"
+        List<Skill> craftingBranch = Arrays.asList(
+                new Skill("extra_durability", "Повышенная прочность", "2% за уровень шанс создать предмет с +10% прочности", SkillType.PASSIVE, 5, 1, null),
+                new Skill("resource_efficiency", "Ресурсная экономия", "2% за уровень шанс не потратить ресурсы при крафте", SkillType.PASSIVE, 5, 2, "extra_durability"),
+                new Skill("double_ingot", "Удвоение слитков", "5% за уровень шанс получить x2 слитка при плавке", SkillType.PASSIVE, 5, 3, "resource_efficiency")
+        );
+
+        // Ветка "Ремонт"
+        List<Skill> repairBranch = Arrays.asList(
+                new Skill("auto_repair", "Авторемонт", "Каждые 30 сек чинит случайный предмет в инвентаре на 5% прочности", SkillType.PASSIVE, 3, 2, null),
+                new Skill("instant_repair", "Мгновенный ремонт", "Чинит все предметы в инвентаре на 50% прочности (перезарядка 300 сек)", SkillType.ACTIVE, 1, 4, "auto_repair")
+        );
+
+        // Ветка "Огненное мастерство"
+        List<Skill> fireMasteryBranch = Arrays.asList(
+                new Skill("fire_immunity", "Огненный иммунитет", "Полный иммунитет к урону от огня и лавы", SkillType.PASSIVE, 1, 2, null),
+                new Skill("hot_strike", "Раскалённый удар", "Следующая атака поджигает цель на 5 сек (перезарядка 30 сек)", SkillType.ACTIVE, 1, 3, "fire_immunity"),
+                new Skill("forge_master", "Мастер горна", "Ускоряет плавку в печах на 50% и удваивает шанс успеха чар", SkillType.GLOBAL, 1, 5, "hot_strike")
+        );
+
+        smithTree.addBranch(craftingBranch);
+        smithTree.addBranch(repairBranch);
+        smithTree.addBranch(fireMasteryBranch);
+        CLASS_SKILL_TREES.put("smith", smithTree);
     }
 
     public static SkillTree getSkillTree(String className) {

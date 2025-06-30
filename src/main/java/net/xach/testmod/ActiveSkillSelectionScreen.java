@@ -52,6 +52,18 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
                     if (cap.getSkillLevel("vein_miner") > 0) availableSkills.add("vein_miner");
                     if (cap.getSkillLevel("night_vision") > 0) availableSkills.add("night_vision");
                     if (cap.getSkillLevel("instant_repair") > 0) availableSkills.add("instant_repair");
+                } else if (playerClass.equals("pivo")) {
+                    if (cap.getSkillLevel("master_brewer") > 0) availableSkills.add("master_brewer");
+                    if (cap.getSkillLevel("bottle_throw") > 0) availableSkills.add("bottle_throw");
+                    if (cap.getSkillLevel("berserker_drink") > 0) availableSkills.add("berserker_drink");
+                    if (cap.getSkillLevel("healing_ale") > 0) availableSkills.add("healing_ale");
+                    if (cap.getSkillLevel("party_time") > 0) availableSkills.add("party_time");
+                } else if (playerClass.equals("cook")) {
+                    if (cap.getSkillLevel("smoke_screen") > 0) availableSkills.add("smoke_screen");
+                    if (cap.getSkillLevel("banquet") > 0) availableSkills.add("banquet");
+                } else if (playerClass.equals("smith")) {
+                    if (cap.getSkillLevel("instant_repair") > 0) availableSkills.add("instant_repair");
+                    if (cap.getSkillLevel("hot_strike") > 0) availableSkills.add("hot_strike");
                 }
 
                 // Создаем кнопки для каждого доступного навыка
@@ -71,7 +83,18 @@ public class ActiveSkillSelectionScreen extends AbstractContainerScreen<ActiveSk
                         case "ore_highlight" -> "Подсветка руды";
                         case "vein_miner" -> "Жилокопатель";
                         case "night_vision" -> "Ночное зрение";
+                        // Навыки для pivo
+                        case "master_brewer" -> "Мастер-пивовар";
+                        case "bottle_throw" -> "Метание бутылок";
+                        case "berserker_drink" -> "Напиток берсерка";
+                        case "healing_ale" -> "Лечебный эль";
+                        case "party_time" -> "Время вечеринки";
+                        // Навыки для cook
+                        case "smoke_screen" -> "Дымовая завеса";
+                        case "banquet" -> "Банкет";
+                        // Навыки для smith
                         case "instant_repair" -> "Мгновенный ремонт";
+                        case "hot_strike" -> "Раскалённый удар";
                         default -> skillId;
                     };
                     this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(

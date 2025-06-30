@@ -71,6 +71,9 @@ public class TestMod {
         ModBiomeModifiers.BIOME_MODIFIER_SERIALIZERS.register(bus);
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(WarSkillHandler.class);
+        MinecraftForge.EVENT_BUS.register(PivoSkillHandler.class);
+        MinecraftForge.EVENT_BUS.register(CookSkillHandler.class);
+        MinecraftForge.EVENT_BUS.register(SmithSkillHandler.class);
 
         registerNetworkPackets();
 
@@ -411,6 +414,13 @@ public class TestMod {
                             Component.literal("Шахтёр"),
                             button -> selectClass("miner"))
                     .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 40)
+                    .size(buttonWidth, buttonHeight)
+                    .build());
+
+            this.addRenderableWidget(net.minecraft.client.gui.components.Button.builder(
+                            Component.literal("Кузнец"),
+                            button -> selectClass("smith"))
+                    .pos(centerX - buttonWidth / 2, centerY - buttonHeight / 2 + 60)
                     .size(buttonWidth, buttonHeight)
                     .build());
         }
